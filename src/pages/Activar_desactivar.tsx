@@ -1,6 +1,6 @@
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-
+import EditIcon from '@mui/icons-material/Edit';
 import {
   Box,
   Breakpoint,
@@ -50,33 +50,23 @@ export const Activar_desactivar = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [alarma, setAlarma] = useState<AlarmaCRUDType | null>();
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   // Variables de páginado
-  const [limite, setLimite] = useState<number>(10)
-  const [pagina, setPagina] = useState<number>(1)
-  const [total, setTotal] = useState<number>(0)
+  const [limite, setLimite] = useState<number>(10);
+  const [pagina, setPagina] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
   const acciones: Array<ReactNode> = [
-    <IconoTooltip
-      id={"agregarArticulo"}
-      titulo={"Agregar Articulo"}
-      key={`accionAgregarArticulo`}
-      accion={() => {
-        agregarAlarmaModal();
-      }}
-      icono={"add_circle_outline"}
-      name={"Agregar Articulo"}
-    />,
-
     <Button
       variant={"contained"}
       sx={{ ml: 1, mr: 1, textTransform: "none" }}
       key={`accionAgregarArticulo`}
       size={"small"}
+      color="success"
       onClick={() => {
         agregarAlarmaModal();
       }}
     >
-      Agregar Artículo
+      <AddCircleIcon /> Añadir alarma
     </Button>,
   ];
   const paginacion = (
@@ -87,7 +77,7 @@ export const Activar_desactivar = () => {
       cambioPagina={setPagina}
       cambioLimite={setLimite}
     />
-  )
+  );
 
   const alarmasData: AlarmaCRUDType[] = [
     {
@@ -229,17 +219,17 @@ export const Activar_desactivar = () => {
       <Grid key={`${alarmaData.id}-${indexAlarma}-accion`}>
         {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
         <Grid>
-          <IconoTooltip
-            id={"editarAlarmas"}
-            name={"Alarmas"}
-            titulo={"Editar"}
-            color={"primary"}
-            accion={() => {
-              //imprimir(`Editaremos`, alarmaData);
-              editarAlarmaModal(alarmaData);
+          <Button
+            variant={'text'}
+            sx={{ ml: 1, mr: 1, textTransform: "none" }}
+            key={`accionAgregarArticulo`}
+            size={"small"}
+            onClick={() => {
+              agregarAlarmaModal();
             }}
-            icono={"edit"}
-          />
+          >
+            <EditIcon/>
+          </Button>
         </Grid>
         {/* )} */}
       </Grid>,
@@ -269,7 +259,7 @@ export const Activar_desactivar = () => {
             </Box>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>
+        {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>
           <Button
             variant="contained"
             color="success"
@@ -277,7 +267,7 @@ export const Activar_desactivar = () => {
           >
             <AddCircleIcon /> Añadir alarma
           </Button>
-        </Grid>
+        </Grid> */}
         <Dialog
           open={openModal}
           onClose={cerrarAlarmaModal}
@@ -295,7 +285,7 @@ export const Activar_desactivar = () => {
         </Dialog>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>
           <CustomDataTable
-            titulo={"Alarmas"}
+            titulo={''}
             error={!!errorArticulosData}
             cargando={loading}
             acciones={acciones}
@@ -303,41 +293,6 @@ export const Activar_desactivar = () => {
             paginacion={paginacion}
             contenidoTabla={contenidoTabla}
           />
-          {/* <TableContainer sx={{ backgroundColor: "white" }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <b>ID Alarma</b>
-                  </TableCell>
-                  <TableCell>
-                    <b>Nombre</b>
-                  </TableCell>
-                  <TableCell>
-                    <b>Detalles de la Alarma</b>
-                  </TableCell>
-                  <TableCell>
-                    <b>Tipo de seguridad</b>
-                  </TableCell>
-                  <TableCell>
-                    <b>Detectar </b>
-                  </TableCell>
-                  <TableCell>
-                    <b>Acciones </b>
-                  </TableCell>
-                  <TableCell>
-                    <b>Activar </b>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <RowAlarmas editarAlarmaModal={editarAlarmaModal} />
-                <RowAlarmas editarAlarmaModal={editarAlarmaModal} />
-                <RowAlarmas editarAlarmaModal={editarAlarmaModal} />
-                <RowAlarmas editarAlarmaModal={editarAlarmaModal} />
-              </TableBody>
-            </Table>
-          </TableContainer> */}
         </Grid>
       </Grid>
     </>

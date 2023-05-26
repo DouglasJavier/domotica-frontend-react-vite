@@ -9,7 +9,6 @@ import {
 } from '@mui/material'
 import { IconoTooltip } from './IconoTooltip'
 import { FC } from 'react'
-import { imprimir } from '../../utils/imprimir'
 import { styled } from '@mui/material/styles'
 
 interface Props {
@@ -59,7 +58,6 @@ export const Paginacion: FC<Props> = ({
   cambioLimite,
 }) => {
   const handleChange = (event: SelectChangeEvent) => {
-    imprimir(`cambio limite: ${event.target.value}`)
     cambioLimite(Number(event.target.value))
   }
 
@@ -120,7 +118,7 @@ export const Paginacion: FC<Props> = ({
             accion={async () => {
               await cambioPagina(pagina - 1)
             }}
-            icono={'chevron_left'}
+            icono={'<'}
           />
           <IconoTooltip
             id={'siguientePagina'}
@@ -130,7 +128,7 @@ export const Paginacion: FC<Props> = ({
             accion={async () => {
               await cambioPagina(pagina + 1)
             }}
-            icono={'chevron_right'}
+            icono={'>'}
           />
         </Box>
       </Grid>
