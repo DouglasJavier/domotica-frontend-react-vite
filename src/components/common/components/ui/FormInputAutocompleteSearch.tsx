@@ -54,7 +54,7 @@ export const FormInputAutocompleteSearch = ({
   noIcon = false,
   options,
   bgcolor,
-  labelVariant = 'subtitle2',
+  labelVariant = 'subtitle1',
 }: FormInputAutocompleteSearchProps) => {
   useEffect(() => {
     if (options.length === 0 && defaultValue.key !== '') {

@@ -42,7 +42,7 @@ export const FormInputDate = <T extends FieldValues>({
   disabled,
   rules,
   bgcolor,
-  labelVariant = 'subtitle2',
+  labelVariant = 'subtitle1',
 }: FormDatePickerProps<T>) => {
   return (
     <div>

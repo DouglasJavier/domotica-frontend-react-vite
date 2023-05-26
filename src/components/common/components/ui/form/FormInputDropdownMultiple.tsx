@@ -48,7 +48,7 @@ export const FormInputDropdownMultiple = <T extends FieldValues>({
   variant,
   bgcolor,
   options,
-  labelVariant = 'subtitle2',
+  labelVariant = 'subtitle1',
 }: FormInputDropdownMultipleProps<T>) => {
   const generateSelectOptions = (value: string[]) => {
     return options.map((option) => {

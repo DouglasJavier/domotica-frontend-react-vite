@@ -25,7 +25,7 @@ export const FormInputRadio = <T extends FieldValues>({
   options,
   rules,
   disabled,
-  labelVariant = 'subtitle2',
+  labelVariant = 'subtitle1',
 }: FormInputRadioProps<T>) => (
   <div>
     <InputLabel htmlFor={id}>

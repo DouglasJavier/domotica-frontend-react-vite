@@ -31,7 +31,7 @@ export const FormInputSlider = <T extends FieldValues>({
   label,
   size = 'small',
   rules,
-  labelVariant = 'subtitle2',
+  labelVariant = 'subtitle1',
 }: FormInputSliderProps<T>) => {
   const [sliderValue, setSliderValue] = React.useState(0)
 

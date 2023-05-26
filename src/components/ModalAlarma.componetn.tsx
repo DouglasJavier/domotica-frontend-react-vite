@@ -20,15 +20,23 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Path, PathValue, useForm } from "react-hook-form";
+import { FormInputText } from "./common/components/ui/form/FormInputText";
+import { FormInputRadio } from "./common/components/ui/form/FormInputRadio";
+import { FormInputSwitch } from "./common/components/ui/form/FormInputSwitch";
+import { FormInputDropdownMultiple } from "./common/components/ui/form/FormInputDropdownMultiple";
+import { FormInputDropdown } from "./common/components/ui/form/FormInputDropdown";
+import { FormInputMultiCheckbox } from "./common/components/ui/form/FormInputMultiCheckbox";
 
 interface CrearEditarAlarmaCRUDType {
   nombre: String;
   sonido: boolean;
   notificacion: boolean;
-  envio_noti: number;
-  simulador: number;
-  ubicaciones: number;
+  envio_noti: string;
+  contactos: string[];
+  simulador: string;
+  ubicaciones: string[];
+  tipo: string[];
 }
 
 interface ModalAlarmaProps {
@@ -42,176 +50,194 @@ export const ModalAlarma = ({
   accionCorrecta,
 }: ModalAlarmaProps) => {
   const [errorNombre, setErrorNombre] = useState<boolean>(false);
-  const [contactos, setContactos] = useState<boolean>(false);
   const [sim, setSim] = useState<number>(0);
-  const { handleSubmit, control } = useForm<CrearEditarAlarmaCRUDType>({
+  const { handleSubmit, control, watch, setValue } = useForm<CrearEditarAlarmaCRUDType>({
     defaultValues: {
-      nombre: "Nueva alarma",
+      nombre: "",
       sonido: true,
       notificacion: true,
+      envio_noti: "0",
+      contactos: [],
+      simulador: "0",
+      ubicaciones: [],
+      tipo: ["1", "2"],
     },
   });
   const handleChange = (event: SelectChangeEvent) => {
     setSim(parseInt(event.target.value) as number);
   };
+  const contactos = [
+    {
+      id: "1",
+      nombre: "Carlos",
+    },
+    {
+      id: "2",
+      nombre: "Maria",
+    },
+    {
+      id: "3",
+      nombre: "Tereza",
+    },
+  ];
+  const simulaciones = [
+    {
+      id: "0",
+      nombre: "Ninguno ",
+    },
+    {
+      id: "1",
+      nombre: "Todos en casa ",
+    },
+    {
+      id: "2",
+      nombre: "Algunos en casa",
+    },
+    {
+      id: "3",
+      nombre: "Uno en casa",
+    },
+  ];
+  const ubicaciones = [
+    {
+      id: "1",
+      nombre: "Patio principal",
+    },
+    {
+      id: "2",
+      nombre: "Sala Principal",
+    },
+    {
+      id: "3",
+      nombre: "Cocina",
+    },
+    {
+      id: "4",
+      nombre: "Dormitorio principal",
+    },
+  ];
+  const tipos = [
+    {
+      id: "1",
+      nombre: "Seguridad de Bienes",
+    },
+    {
+      id: "2",
+      nombre: "Seguridad de Personas",
+    },
+  ];
+  const guardarActualizarAlarma = async (
+    data: CrearEditarAlarmaCRUDType
+  ) => {
+    await guardarActualizarAlarmaPeticion(data)
+  }
+  const guardarActualizarAlarmaPeticion = async (
+    alarma: CrearEditarAlarmaCRUDType
+  ) => {
+    console.log(alarma)
+  }
 
   return (
-    <>
+     <form onSubmit={handleSubmit(guardarActualizarAlarma)}>
       <DialogTitle>
         {Alarma ? "Editar alarma" : "Agregar nueva alarma"}
       </DialogTitle>
       <DialogContent dividers>
-        <InputLabel htmlFor="nombre">
-          <Typography variant="subtitle1" sx={{ color: "text.primary" }}>
-            Nombre de la Alarma
-          </Typography>
-        </InputLabel>
-        <TextField
-          id="nombre"
-          required
-          sx={{
-            width: "90%",
-            bgcolor: "white",
-          }}
-          error={errorNombre}
-          helperText={errorNombre ? "El nombre es requerido" : ""}
-        ></TextField>
-        <Grid container alignItems={"center"}>
-          <InputLabel htmlFor="sonido">
-            <Typography variant="subtitle1" sx={{ color: "text.primary" }}>
-              Activar alerta de sonido :
-            </Typography>
-          </InputLabel>
-          <Switch id="sonido" />
-        </Grid>
-        <Grid container alignItems={"center"}>
-          <InputLabel htmlFor="notificacion">
-            <Typography variant="subtitle1" sx={{ color: "text.primary" }}>
-              Enviar notificación a usuarios :
-            </Typography>
-          </InputLabel>
-          <Switch id="notificacion" />
-        </Grid>
-        <Grid container alignItems={"center"}>
-          <InputLabel
-            htmlFor="notificacion_contactos"
-            sx={{ marginRight: "5px" }}
-          >
-            <Typography variant="subtitle1" sx={{ color: "text.primary" }}>
-              {"Envio de notificaciones a contactos :"}
-            </Typography>
-          </InputLabel>
-          <RadioGroup
-            id="notificacion"
-            defaultValue={0}
-            name="notificacion_contactos"
-            sx={{ display: "flex", flexDirection: "row" }}
-          >
-            <FormControlLabel
-              value={0}
-              control={<Radio />}
-              label="No"
-              onClick={() => setContactos(false)}
+        <FormInputText
+          id={"nombre"}
+          control={control}
+          name="nombre"
+          label="Nombre de la alarma"
+          // disabled={loadingModal}
+          rules={{ required: "Este campo es requerido" }}
+        />
+        <Grid container direction={"column"}>
+          <Grid item xs={12} sm={12} md={6}>
+            <FormInputMultiCheckbox
+              id={"tipo"}
+              name="tipo"
+              control={control}
+              label="Seguridad dirigida para :"
+              options={tipos.map((tipo) => ({
+                key: tipo.id,
+                value: tipo.id,
+                label: tipo.nombre,
+              }))}
+              rules={{ required: "Este campo es requerido" }}
+              setValue={setValue}
+              />
+          </Grid>
+          <Grid item xs={12} sm={12} md={6}>
+            <FormInputSwitch
+              id={"sonido"}
+              control={control}
+              name="sonido"
+              label="Activar alerta de sonido :"
             />
-            <FormControlLabel
-              value={1}
-              control={<Radio />}
-              label="Preguntar primero"
-              onClick={() => setContactos(true)}
+            <FormInputSwitch
+              id={"notificacion"}
+              control={control}
+              name="notificacion"
+              label="Enviar notificación a usuarios :"
             />
-            <FormControlLabel
-              value={2}
-              control={<Radio />}
-              label="Automático"
-              onClick={() => setContactos(true)}
-            />
-          </RadioGroup>
+          </Grid>
         </Grid>
-        {contactos && (
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            fullWidth
-            /* onChange={handleChange} */
-            renderValue={(selecteds: string[]) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                <Chip label={0} />
-                <Chip label={"asd"} />
-                <Chip label={2} />
-                <Chip label={3} />
-              </Box>
+
+        <Grid container alignItems={"center"} direction={"row"}>
+          <Grid item xs={12} sm={12} md={4}>
+            <FormInputRadio
+              id={"envio_noti"}
+              name="envio_noti"
+              control={control}
+              label="Envio de notificaciones a contactos :"
+              options={[
+                { label: "No", value: "0" },
+                { label: "Preguntar primero", value: "1" },
+                { label: "Automaticamente", value: "2" },
+              ]}
+            />
+          </Grid>
+          <Grid item xs={12} sm={12} md={7}>
+            {watch("envio_noti") !== "0" && (
+              <FormInputDropdownMultiple
+                id={"contactos"}
+                name="contactos"
+                control={control}
+                label="Contactos a notificar:"
+                options={contactos.map((contacto) => ({
+                  key: contacto.id,
+                  value: contacto.id,
+                  label: contacto.nombre,
+                }))}
+                rules={{ required: "Este campo es requerido" }}
+              />
             )}
-          >
-            <MenuItem value={0}>
-              <Checkbox />
-              asdasd
-            </MenuItem>
-            <MenuItem value={1}>
-              <Checkbox />
-              asdasd
-            </MenuItem>
-            <MenuItem value={2}>
-              <Checkbox />
-              asdasd
-            </MenuItem>
-            <MenuItem value={3}>
-              <Checkbox />
-              asdasd
-            </MenuItem>
-          </Select>
-        )}
-        <Grid container alignItems={"center"}>
-          <InputLabel htmlFor="simulacion" sx={{ marginRight: "5px" }}>
-            <Typography variant="subtitle1" sx={{ color: "text.primary" }}>
-              Simulacion de presencia :
-            </Typography>
-          </InputLabel>
-          <Select
-            id="simulacion"
-            value={sim.toString()}
-            onChange={handleChange}
-          >
-            <MenuItem value={0}>Ninguno</MenuItem>
-            <MenuItem value={1}>Todos presentes</MenuItem>
-            <MenuItem value={2}>algunos presentes</MenuItem>
-            <MenuItem value={3}>alguin prensente</MenuItem>
-          </Select>
+          </Grid>
         </Grid>
-        <InputLabel htmlFor="ubicaciones">
-          <Typography variant="subtitle1" sx={{ color: "text.primary" }}>
-            La alarma estará activa en las ubicaciones:
-          </Typography>
-        </InputLabel>
-        <Select
-          id="ubicaciones"
-          fullWidth
-          /* onChange={handleChange} */
-          renderValue={(selecteds: string[]) => (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              <Chip label={0} />
-              <Chip label={"asd"} />
-              <Chip label={2} />
-              <Chip label={3} />
-            </Box>
-          )}
-        >
-          <MenuItem value={0}>
-            <Checkbox />
-            asdasd
-          </MenuItem>
-          <MenuItem value={1}>
-            <Checkbox />
-            asdasd
-          </MenuItem>
-          <MenuItem value={2}>
-            <Checkbox />
-            asdasd
-          </MenuItem>
-          <MenuItem value={3}>
-            <Checkbox />
-            asdasd
-          </MenuItem>
-        </Select>
+        <FormInputDropdown
+          id={"simulador"}
+          name="simulador"
+          control={control}
+          label="Activar simulación de presencia:"
+          options={simulaciones.map((simulacion) => ({
+            key: simulacion.id,
+            value: simulacion.id,
+            label: simulacion.nombre,
+          }))}
+          rules={{ required: "Este campo es requerido" }}
+        />
+        <FormInputDropdownMultiple
+          id={"ubicaciones"}
+          name="ubicaciones"
+          control={control}
+          label="La alarma estará activa en las ubicaciones:"
+          options={ubicaciones.map((ubicacion) => ({
+            key: ubicacion.id,
+            value: ubicacion.id,
+            label: ubicacion.nombre,
+          }))}
+          rules={{ required: "Este campo es requerido" }}
+        />
       </DialogContent>
       <DialogActions
         sx={{
@@ -232,6 +258,6 @@ export const ModalAlarma = ({
           Salir
         </Button>
       </DialogActions>
-    </>
+      </form>
   );
 };

@@ -14,7 +14,7 @@ export const FullScreenLoading: FC<Props> = ({ mensaje }) => {
       minHeight="100vh"
     >
       {mensaje ? (
-        <Typography variant={'subtitle2'}>{mensaje}</Typography>
+        <Typography variant={'subtitle1'}>{mensaje}</Typography>
       ) : null}
       <Box width={'10px'} />
       <div className="spinner">

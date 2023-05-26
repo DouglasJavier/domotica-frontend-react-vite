@@ -207,7 +207,7 @@ export const CustomDataTable = ({
                               >
                                 <Typography
                                   color="text.secondary"
-                                  variant={'subtitle2'}
+                                  variant={'subtitle1'}
                                 >
                                   {columnas[indexContenido].nombre}
                                 </Typography>
