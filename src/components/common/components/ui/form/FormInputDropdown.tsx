@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { RegisterOptions } from "react-hook-form/dist/types/validator";
 import ClearOutlined from "@mui/icons-material/ClearOutlined";
-import React from "react";
+import React, { useEffect } from "react";
 import { Variant } from "@mui/material/styles/createTypography";
 
 export interface optionType {
@@ -37,6 +37,7 @@ type FormInputDropdownProps<T extends FieldValues> = {
   onChange?: (event: SelectChangeEvent) => void;
   onClear?: () => void;
   bgcolor?: string;
+  defaultValue?: optionType;
   options: optionType[];
   labelVariant?: Variant;
 };
@@ -49,6 +50,7 @@ export const FormInputDropdown = <T extends FieldValues>({
   size = "small",
   rules,
   disabled,
+  defaultValue,
   onChange,
   options,
   onClear,
@@ -64,6 +66,16 @@ export const FormInputDropdown = <T extends FieldValues>({
       );
     });
   };
+  useEffect(() => {
+    if (defaultValue) {
+      if (options.length === 0 && defaultValue.key !== "") {
+        options.push(defaultValue);
+      } else if (!options.some((option) => option.key === defaultValue.key)) {
+        options.push(defaultValue);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options]);
 
   return (
     <Grid container alignItems={"center"}>
@@ -110,7 +122,8 @@ export const FormInputDropdown = <T extends FieldValues>({
                   field.onChange(event);
                 }}
                 inputRef={field.ref}
-                value={field.value}
+                //value={field.value}
+                value={defaultValue?.value }
                 endAdornment={
                   field.value && onClear ? (
                     <IconButton

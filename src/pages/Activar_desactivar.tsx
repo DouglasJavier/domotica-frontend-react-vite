@@ -3,18 +3,10 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from '@mui/icons-material/Edit';
 import {
   Box,
-  Breakpoint,
   Button,
   Card,
   Dialog,
   Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  ToggleButton,
   Typography,
 } from "@mui/material";
 import { RowAlarmas } from "../components/RowAlarmas.component";
