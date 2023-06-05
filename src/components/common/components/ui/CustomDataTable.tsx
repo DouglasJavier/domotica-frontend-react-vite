@@ -42,7 +42,7 @@ export const CustomDataTable = ({
   const theme = useTheme()
   // const sm = useMediaQuery(theme.breakpoints.only('sm'))
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
-
+  console.log(columnas)
   return (
     <Box sx={{ pb: 2 }}>
       {/*título y acciones*/}
@@ -209,7 +209,7 @@ export const CustomDataTable = ({
                                   color="text.secondary"
                                   variant={'subtitle1'}
                                 >
-                                  {columnas[indexContenido].nombre}
+                                  {columnas[indexContenido]?.nombre}
                                 </Typography>
                                 {contenido}
                               </Grid>
@@ -224,7 +224,7 @@ export const CustomDataTable = ({
                     <Table>
                       <TableHead>
                         <TableRow>
-                          {columnas.map((columna, index) => (
+                          {columnas?.map((columna, index) => (
                             <TableCell key={`cabecera-id-${index}`}>
                               <Typography
                                 variant={'caption'}

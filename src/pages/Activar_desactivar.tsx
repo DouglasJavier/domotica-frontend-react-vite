@@ -85,7 +85,7 @@ export const Activar_desactivar = () => {
     },
     {
       id: "2",
-      nombre: "Alarma 1",
+      nombre: "Alarma 2",
       sonido: true,
       notificacion: true,
       envio_noti: "1",
@@ -96,7 +96,7 @@ export const Activar_desactivar = () => {
     },
     {
       id: "3",
-      nombre: "Alarma 1",
+      nombre: "Alarma 3",
       sonido: true,
       notificacion: true,
       envio_noti: "1",
@@ -107,7 +107,7 @@ export const Activar_desactivar = () => {
     },
     {
       id: "4",
-      nombre: "Alarma 1",
+      nombre: "Alarma 4",
       sonido: true,
       notificacion: true,
       envio_noti: "1",
@@ -118,7 +118,7 @@ export const Activar_desactivar = () => {
     },
     {
       id: "5",
-      nombre: "Alarma 1",
+      nombre: "Alarma 5",
       sonido: true,
       notificacion: true,
       envio_noti: "1",

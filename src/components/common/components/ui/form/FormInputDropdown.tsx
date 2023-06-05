@@ -40,6 +40,7 @@ type FormInputDropdownProps<T extends FieldValues> = {
   defaultValue?: optionType;
   options: optionType[];
   labelVariant?: Variant;
+  directionColumn?: boolean;
 };
 
 export const FormInputDropdown = <T extends FieldValues>({
@@ -56,6 +57,7 @@ export const FormInputDropdown = <T extends FieldValues>({
   onClear,
   bgcolor,
   labelVariant = "subtitle1",
+  directionColumn
 }: FormInputDropdownProps<T>) => {
   const generateSelectOptions = () => {
     return options.map((option) => {
@@ -78,7 +80,7 @@ export const FormInputDropdown = <T extends FieldValues>({
   }, [options]);
 
   return (
-    <Grid container alignItems={"center"}>
+    <Grid container  direction={directionColumn ? 'column' : 'row'} >
       <Grid item xs={12} sm={12} md={4}>
         <InputLabel htmlFor={id}>
           <Typography
