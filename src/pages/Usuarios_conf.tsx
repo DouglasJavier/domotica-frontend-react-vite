@@ -6,11 +6,6 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Delete, Edit } from "@mui/icons-material";
 import { CustomDataTable } from "../components/common/components/ui/CustomDataTable";
 import { ModalUsuario } from "../components/usuario/ModalUsuario.component";
-//import { ModalUsuario } from "../components/usuario/ModalUsuario.component";
-//import { ModalUsuario } from "../components/usuarios/ModalUsuarios";
-
-//import { ModalUsuarioFotos } from "../components/usuario-activacion/RowUsuarioActivacion.component";
-
 interface UsuarioType {
   id: string;
   nombres: string;

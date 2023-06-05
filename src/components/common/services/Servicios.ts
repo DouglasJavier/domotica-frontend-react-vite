@@ -5,7 +5,6 @@ import axios, {
   Method,
   ResponseType,
 } from 'axios'
-import { imprimir } from '../utils/imprimir'
 
 export type peticionFormatoMetodo = {
   tipo?: Method
@@ -62,7 +61,6 @@ class ServiciosClass {
     withCredentials = true,
   }: peticionFormatoMetodo) {
     try {
-      imprimir(`enviando 🌍`, body, tipo, url, headers)
       const response = await this.peticionHTTP({
         url,
         tipo,
@@ -72,7 +70,6 @@ class ServiciosClass {
         responseType,
         withCredentials,
       })
-      imprimir('respuesta 📡', body, tipo, url, response)
       return response.data
     } catch (e: AxiosError | any) {
       if (e.code === 'ECONNABORTED') {

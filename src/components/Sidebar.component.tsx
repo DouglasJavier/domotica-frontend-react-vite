@@ -1,12 +1,9 @@
 import {
   Box,
   Drawer,
-  Icon,
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Typography,
   useMediaQuery,
   useTheme,
@@ -263,33 +260,6 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
                   </Box>
                 </ListItemButton>
               </ListItem>
-              {/* <ListItem disablePadding>
-                <ListItemButton
-                  component={NavLink}
-                  to="/config_alarmas"
-                  sx={{
-                    "&.active": {
-                      backgroundColor: "#E5E5E5",
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      p: "1 2 3 4",
-                      m: 0,
-                      borderRadius: 1,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Box width={"20px"} />
-                    <RoomPreferencesIcon />
-                    <Box width={"20px"} />
-                    <Typography variant={"body1"}>Alarmas</Typography>
-                  </Box>
-                </ListItemButton>
-              </ListItem> */}
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}

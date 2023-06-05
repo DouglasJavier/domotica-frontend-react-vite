@@ -9,7 +9,6 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { RowAlarmas } from "../components/RowAlarmas.component";
 import { ReactNode, useState } from "react";
 import { ModalAlarma } from "../components/ModalAlarma.componetn";
 
@@ -217,7 +216,7 @@ export const Activar_desactivar = () => {
             key={`accionAgregarArticulo`}
             size={"small"}
             onClick={() => {
-              agregarAlarmaModal();
+              editarAlarmaModal(alarmaData);
             }}
           >
             <EditIcon/>
@@ -251,15 +250,6 @@ export const Activar_desactivar = () => {
             </Box>
           </Card>
         </Grid>
-        {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={agregarAlarmaModal}
-          >
-            <AddCircleIcon /> Añadir alarma
-          </Button>
-        </Grid> */}
         <Dialog
           open={openModal}
           onClose={cerrarAlarmaModal}
@@ -267,7 +257,7 @@ export const Activar_desactivar = () => {
           maxWidth={"md"}
         >
           <ModalAlarma
-            Alarma={alarma}
+            alarma={alarma}
             accionCancelar={cerrarAlarmaModal}
             accionCorrecta={() => {
               cerrarAlarmaModal().finally();

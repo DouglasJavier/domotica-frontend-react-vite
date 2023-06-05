@@ -1,15 +1,8 @@
 import {
   Grid,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   Typography,
   Dialog,
   Button,
-  Tooltip,
 } from "@mui/material";
 import { ReactNode, useState } from "react";
 import { Paginacion } from "../components/common/components/ui/Paginacion";
@@ -19,9 +12,6 @@ import { Delete, Edit } from "@mui/icons-material";
 import { CustomDataTable } from "../components/common/components/ui/CustomDataTable";
 import { ModalSimulador } from "../components/simulacion-presencia/ModalSimulacion";
 import dayjs from "dayjs";
-
-//import { ModalsimuladorFotos } from "../components/historial-activacion/RowsimuladorActivacion.component";
-
 interface horario {
   horaInicio: Date;
   horaFin: Date;

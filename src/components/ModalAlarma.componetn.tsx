@@ -1,23 +1,10 @@
 import {
-  Box,
   Button,
-  Checkbox,
-  Chip,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
   Grid,
-  InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
   SelectChangeEvent,
-  Switch,
-  TextField,
-  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { Path, PathValue, useForm } from "react-hook-form";
@@ -40,12 +27,12 @@ interface CrearEditarAlarmaCRUDType {
 }
 
 interface ModalAlarmaProps {
-  Alarma?: CrearEditarAlarmaCRUDType | null;
+  alarma?: CrearEditarAlarmaCRUDType | null;
   accionCancelar: () => void;
   accionCorrecta: () => void;
 }
 export const ModalAlarma = ({
-  Alarma,
+  alarma,
   accionCancelar,
   accionCorrecta,
 }: ModalAlarmaProps) => {
@@ -53,14 +40,14 @@ export const ModalAlarma = ({
   const [sim, setSim] = useState<number>(0);
   const { handleSubmit, control, watch, setValue } = useForm<CrearEditarAlarmaCRUDType>({
     defaultValues: {
-      nombre: "",
-      sonido: true,
-      notificacion: true,
-      envio_noti: "0",
-      contactos: [],
-      simulador: "0",
-      ubicaciones: [],
-      tipo: ["1", "2"],
+      nombre: alarma?.nombre,
+      sonido: alarma?.sonido,
+      notificacion: alarma?.notificacion,
+      envio_noti: alarma?.envio_noti,
+      contactos: alarma?.contactos,
+      simulador: alarma?.simulador,
+      ubicaciones: alarma?.ubicaciones,
+      tipo: alarma?.tipo,
     },
   });
   const handleChange = (event: SelectChangeEvent) => {
@@ -140,7 +127,7 @@ export const ModalAlarma = ({
   return (
      <form onSubmit={handleSubmit(guardarActualizarAlarma)}>
       <DialogTitle>
-        {Alarma ? "Editar alarma" : "Agregar nueva alarma"}
+        {alarma ? "Editar alarma" : "Agregar nueva alarma"}
       </DialogTitle>
       <DialogContent dividers>
         <FormInputText

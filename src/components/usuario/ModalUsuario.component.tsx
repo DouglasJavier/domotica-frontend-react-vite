@@ -1,40 +1,18 @@
 import {
   Button,
-  Card,
-  CardMedia,
   DialogContent,
   DialogActions,
   DialogTitle,
-  Paper,
   Grid,
-  Table,
-  TableCell,
-  TableHead,
-  TableRow,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 
-import AddIcon from "@mui/icons-material/Add";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   FormInputText,
-  FormInputMultiCheckbox,
-  FormInputRadio,
-  FormInputDropdownMultiple,
   FormInputDropdown,
   optionType,
 } from "../common/components/ui/form";
-import dayjs from "dayjs";
-import { FormInputSwitch } from "../common/components/ui/form/FormInputSwitch";
-import { useAlerts } from "../common/hooks";
-import { useEffect, useState } from "react";
-import { FormInputTime } from "../common/components/ui/form/FormInputTime";
-// Hook para mostrar alertas
-//const { Alerta } = useAlerts();
-
+import { useState } from "react";
 interface UsuarioType {
   id: string;
   nombres: string;

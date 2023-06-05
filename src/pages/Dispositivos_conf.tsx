@@ -6,10 +6,6 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Delete, Edit } from "@mui/icons-material";
 import { CustomDataTable } from "../components/common/components/ui/CustomDataTable";
 import { ModalDispositivo } from "../components/dispositivo/ModalDispositivo.component";
-//import { ModalDispositivo } from "../components/dispositivos/ModalDispositivos";
-
-//import { ModalDispositivoFotos } from "../components/dispositivo-activacion/RowDispositivoActivacion.component";
-
 interface sensorType {
   id: string;
   pin: number;

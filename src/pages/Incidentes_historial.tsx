@@ -1,16 +1,9 @@
 import {
   Grid,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   Typography,
   Dialog,
   Button,
 } from "@mui/material";
-import { RowIncidentes } from "../components/historial-incidentes/RowIncidentes.component";
 import { ReactNode, useState } from "react";
 import { ModalHistorialFotos } from "../components/historial-incidentes/ModalHistorialFotos";
 import { Delete } from "@mui/icons-material";
