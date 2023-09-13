@@ -60,11 +60,11 @@ export const FormInputMultiCheckbox = <T extends FieldValues>({
                     <Checkbox
                       id={id}
                       size={size}
-                      checked={field.value.includes(option.value)}
+                      checked={field.value?.includes(option.value)}
                       onChange={() => {
-                        const isPresent = field.value.indexOf(option.value)
+                        const isPresent = field.value?.indexOf(option.value)
                         if (isPresent !== -1) {
-                          const remaining = field.value.filter(
+                          const remaining = field.value?.filter(
                             (item: string) => item !== option.value
                           )
                           setValue(name, remaining)

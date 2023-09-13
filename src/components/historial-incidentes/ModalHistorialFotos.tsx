@@ -6,6 +6,7 @@ import {
   Paper,
 } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
+import { FotoType } from "./types/historialType";
 
 interface HistorialType {
   id: string;
@@ -16,7 +17,7 @@ interface HistorialType {
 }
 
 interface ModalAlarmaProps {
-  Fotos?: HistorialType | null;
+  Fotos?: FotoType[] | null;
   accionCancelar: () => void;
 }
 var items = [

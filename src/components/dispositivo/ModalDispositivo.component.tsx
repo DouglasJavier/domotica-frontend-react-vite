@@ -14,7 +14,7 @@ import {
 
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { useFieldArray, useForm } from "react-hook-form";
-import { FormInputText, optionType } from "../common/components/ui/form";
+import { FormInputText, optionType } from "../../../common/components/ui/form";
 import { useState } from "react";
 interface sensorType {
   //id: string;

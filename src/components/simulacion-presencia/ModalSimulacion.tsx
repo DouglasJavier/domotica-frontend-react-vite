@@ -20,11 +20,11 @@ import {
   FormInputText,
   FormInputDropdown,
   optionType,
-} from "../common/components/ui/form";
+} from "../../../common/components/ui/form";
 import dayjs from "dayjs";
-import { FormInputSwitch } from "../common/components/ui/form/FormInputSwitch";
+import { FormInputSwitch } from "../../../common/components/ui/form/FormInputSwitch";
 import { useEffect, useState } from "react";
-import { FormInputTime } from "../common/components/ui/form/FormInputTime";
+import { FormInputTime } from "../../../common/components/ui/form/FormInputTime";
 interface horario {
   horaInicio: Date;
   horaFin: Date;

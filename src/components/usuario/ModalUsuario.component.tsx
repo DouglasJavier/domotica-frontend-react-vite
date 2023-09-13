@@ -11,7 +11,7 @@ import {
   FormInputText,
   FormInputDropdown,
   optionType,
-} from "../common/components/ui/form";
+} from "../../../common/components/ui/form";
 import { useState } from "react";
 interface UsuarioType {
   id: string;
@@ -43,6 +43,9 @@ export const ModalUsuario = ({
         rol: usuario?.rol,
       },
     });
+  console.log("*******************************************");
+  console.log(getValues());
+  console.log("*******************************************");
   const defaultOption = { key: "", value: "", label: "" };
 
   const [defaultActuadorData, setDefaultActuadorData] =
@@ -99,17 +102,17 @@ export const ModalUsuario = ({
               control={control}
               name="rol"
               label="Rol"
-              directionColumn = {true}
+              //directionColumn={true}
               options={[
                 {
-                  key: 'Admin',
-                  value: 'ADMINISTRADOR',
-                  label: 'Administrador',
+                  key: "ADMINISTRADOR",
+                  value: "ADMINISTRADOR",
+                  label: "Administrador",
                 },
                 {
-                  key: 'User',
-                  value: 'USUARIO',
-                  label: 'Usuario',
+                  key: "USUARIO",
+                  value: "USUARIO",
+                  label: "Usuario",
                 },
               ]}
               // disabled={loadingModal}

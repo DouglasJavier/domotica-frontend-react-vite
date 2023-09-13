@@ -22,7 +22,7 @@ interface Props {
 }
 
 export const IconoTooltip: FC<PropsWithChildren<Props>> = ({
-  color = 'primary',
+  color = 'secondary',
   icono,
   titulo,
   accion,

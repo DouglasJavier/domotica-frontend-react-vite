@@ -11,7 +11,7 @@ import {
   FormInputText,
   optionType,
   FormInputDropdownMultiple,
-} from "../common/components/ui/form";
+} from "../../../common/components/ui/form";
 import { useState } from "react";
 
 interface AlarmaType {

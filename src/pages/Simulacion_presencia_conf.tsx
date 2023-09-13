@@ -5,11 +5,11 @@ import {
   Button,
 } from "@mui/material";
 import { ReactNode, useState } from "react";
-import { Paginacion } from "../components/common/components/ui/Paginacion";
-import { ColumnaType } from "../components/common/types";
+import { Paginacion } from "../../common/components/ui/Paginacion";
+import { ColumnaType } from "../../common/types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Delete, Edit } from "@mui/icons-material";
-import { CustomDataTable } from "../components/common/components/ui/CustomDataTable";
+import { CustomDataTable } from "../../common/components/ui/CustomDataTable";
 import { ModalSimulador } from "../components/simulacion-presencia/ModalSimulacion";
 import dayjs from "dayjs";
 interface horario {

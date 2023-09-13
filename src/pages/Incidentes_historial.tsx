@@ -1,30 +1,31 @@
-import {
-  Grid,
-  Typography,
-  Dialog,
-  Button,
-} from "@mui/material";
-import { ReactNode, useState } from "react";
+import { Grid, Typography, Dialog, Button } from "@mui/material";
+import { ReactNode, useEffect, useState } from "react";
 import { ModalHistorialFotos } from "../components/historial-incidentes/ModalHistorialFotos";
 import { Delete } from "@mui/icons-material";
-import { ColumnaType } from "../components/common/types";
-import { CustomDataTable } from "../components/common/components/ui";
-import { Paginacion } from "../components/common/components/ui/Paginacion";
+import { ColumnaType } from "../../common/types";
+import { AlertDialog, CustomDataTable } from "../../common/components/ui";
+import { Paginacion } from "../../common/components/ui/Paginacion";
 import BurstModeIcon from "@mui/icons-material/BurstMode";
+import axios from "axios";
+import { HistorialType } from "../components/historial-incidentes/types/historialType";
+import { useAlerts } from "../../common/hooks";
+import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
+import { ModalIncidente } from "../components/historial-incidentes/ModalIncidentes";
 
-
-interface HistorialType {
-  id: string;
-  fecha: Date;
-  ubicacion: string;
-  detalles: string;
-  fotos: string[];
-}
 export const Incidentes_historial = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [incidentes, setIncidentes] = useState<HistorialType | null>();
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
+  const [modalHistorial, setModalHistorial] = useState<boolean>(false);
+  const [historialIncidentesData, setHistorialIncidentesData] = useState<
+    HistorialType[]
+  >([]);
+  const [historialIncidente, setHistorialIncidente] =
+    useState<HistorialType | null>();
+  const [mostrarAlertaEliminarHistorial, setMostrarAlertaEliminarHistorial] =
+    useState(false);
+
   // Variables de páginado
   const [limite, setLimite] = useState<number>(10);
   const [pagina, setPagina] = useState<number>(1);
@@ -37,7 +38,7 @@ export const Incidentes_historial = () => {
       size={"small"}
       color="error"
       onClick={() => {
-        //agregarHistorialADModal();
+        agregarhistorialModal();
       }}
     >
       Eliminar historial
@@ -52,38 +53,29 @@ export const Incidentes_historial = () => {
       cambioLimite={setLimite}
     />
   );
-
-  const historialData: HistorialType[] = [
-    {
-      id: "1",
-      fecha: new Date("2023/05/26"),
-      ubicacion: "Patio Principal",
-      detalles: "el sensor PIR detectó movimientos",
-      fotos: ["1", "2", "3"],
-    },
-    {
-      id: "2",
-      fecha: new Date("2023/05/23"),
-      ubicacion: "Patio Principal",
-      detalles: "el sensor PIR detectó movimientos",
-      fotos: ["1", "2", "3"],
-    },
-    {
-      id: "3",
-      fecha: new Date("2023/05/21"),
-      ubicacion: "Cocina",
-      detalles: "Se detectó altas concentraciones de CO2",
-      fotos: ["1", "2", "3"],
-    },
-    {
-      id: "4",
-      fecha: new Date("2023/05/19"),
-      ubicacion: "Sala principal",
-      detalles: "El sensor de la puerta detectó movimientos",
-      fotos: ["1", "2", "3"],
-    },
-  ];
-
+  const { Alerta } = useAlerts();
+  /**************************************************************************/
+  const peticionHistorialIncidentes = async () => {
+    console.log("Obteniendo datos");
+    const data = await axios.get("http://localhost:5000/historialIncidentes");
+    setHistorialIncidentesData(data.data[0]);
+  };
+  const eliminarHistorialIncidentePeticion = async (
+    historialData: HistorialType
+  ) => {
+    //setLoading(true);
+    await axios
+      .patch(
+        `http://localhost:5000/historialIncidentes/${historialIncidente?.id}/limpiar`
+      )
+      .then((res) => {
+        Alerta({ mensaje: `completado con exito`, variant: "success" });
+      })
+      .catch((err) => {
+        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      });
+  };
+  /**************************************************************************/
   const cerrarFotoModal = async () => {
     setOpenModal(false);
     setIncidentes(undefined);
@@ -93,8 +85,11 @@ export const Incidentes_historial = () => {
     setOpenModal(true);
     setIncidentes(historial);
   };
-  const obtenerIncidentesPeticion = async () => {
-    console.log("obteniendo sistema");
+  const cerrarHistorialModalEliminar = async () => {
+    setModalHistorial(false);
+  };
+  const agregarhistorialModal = () => {
+    setModalHistorial(true);
   };
   const columnas: Array<ColumnaType> = [
     { campo: "id_historial", nombre: "ID Historial" },
@@ -105,7 +100,7 @@ export const Incidentes_historial = () => {
     { campo: "acciones", nombre: "" },
   ];
 
-  const contenidoTabla: Array<Array<ReactNode>> = historialData.map(
+  const contenidoTabla: Array<Array<ReactNode>> = historialIncidentesData.map(
     (historialData, indexHistorialAD) => [
       <Typography
         key={`${historialData.id}-${indexHistorialAD}-id_historial`}
@@ -119,13 +114,13 @@ export const Incidentes_historial = () => {
         key={`${historialData.id}-${indexHistorialAD}- ubicacion`}
         variant={"body2"}
       >
-        {`${historialData.ubicacion}`}
+        {`${historialData.sensor.ubicacion.nombre}`}
       </Typography>,
       <Typography
         key={`${historialData.id}-${indexHistorialAD}- detalles`}
         variant={"body2"}
       >
-        {`${historialData.detalles}`}
+        {`El Sensor ${historialData.sensor.descripcion} detectó un incidente`}
       </Typography>,
       <Grid key={`${historialData.id}-${indexHistorialAD}-fotos`}>
         {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
@@ -152,8 +147,8 @@ export const Incidentes_historial = () => {
             key={`accionAgregarArticulo`}
             size={"small"}
             color="error"
-            onClick={() => {
-              // agregarHistorialADModal();
+            onClick={async () => {
+              await eliminarHistorialModal(historialData);
             }}
           >
             <Delete />
@@ -164,8 +159,57 @@ export const Incidentes_historial = () => {
     ]
   );
 
+  const eliminarHistorialModal = async (historial: HistorialType) => {
+    setHistorialIncidente(historial); // para mostrar datos de articulo en la alerta
+    setMostrarAlertaEliminarHistorial(true); // para mostrar alerta de articulos
+  };
+  const aceptarAlertaEliminarAlarma = async () => {
+    setMostrarAlertaEliminarHistorial(false);
+    if (historialIncidente) {
+      await eliminarHistorialIncidentePeticion(historialIncidente);
+    }
+    setHistorialIncidente(null);
+  };
+
+  const cancelarAlertaEliminarAlarma = async () => {
+    setMostrarAlertaEliminarHistorial(false);
+    setHistorialIncidente(null);
+  };
+  const refrescar = async () => {
+    peticionHistorialIncidentes();
+  };
+  useEffect(() => {
+    peticionHistorialIncidentes();
+  }, []);
+
+  useEffect(() => {
+    peticionHistorialIncidentes();
+  }, [historialIncidente]);
+
   return (
     <Grid container justifyContent={"center"}>
+      <AlertDialog
+        isOpen={mostrarAlertaEliminarHistorial}
+        titulo={"Alerta"}
+        texto={`¿Está seguro de Eliminar el registro de incidente ${historialIncidente?.id} ?`}
+      >
+        <Button onClick={cancelarAlertaEliminarAlarma}>Cancelar</Button>
+        <Button onClick={aceptarAlertaEliminarAlarma}>Aceptar</Button>
+      </AlertDialog>
+      <Dialog
+        open={modalHistorial}
+        onClose={cerrarHistorialModalEliminar}
+        fullWidth={true}
+        maxWidth={"sm"}
+      >
+        <ModalIncidente
+          accionCancelar={cerrarHistorialModalEliminar}
+          accionCorrecta={() => {
+            cerrarHistorialModalEliminar().finally();
+            refrescar().finally();
+          }}
+        />
+      </Dialog>
       <Dialog
         open={openModal}
         onClose={cerrarFotoModal}
@@ -173,7 +217,7 @@ export const Incidentes_historial = () => {
         maxWidth={"sm"}
       >
         <ModalHistorialFotos
-          Fotos={incidentes}
+          Fotos={incidentes?.fotos}
           accionCancelar={cerrarFotoModal}
         />
       </Dialog>

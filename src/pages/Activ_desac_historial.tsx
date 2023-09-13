@@ -4,24 +4,24 @@ import {
   Button,
 } from "@mui/material";
 import { ReactNode, useState } from "react";
-import { Paginacion } from "../components/common/components/ui/Paginacion";
-import { ColumnaType } from "../components/common/types";
+import { Paginacion } from "../../common/components/ui/Paginacion";
+import { ColumnaType } from "../../common/types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Delete } from "@mui/icons-material";
-import { CustomDataTable } from "../components/common/components/ui/CustomDataTable";
+import { CustomDataTable } from "../../common/components/ui/CustomDataTable";
 
-//import { ModalHistorialADFotos } from "../components/historial-activacion/RowHistorialADActivacion.component";
+//import { ModalalarmaFotos } from "../components/historial-activacion/RowalarmaActivacion.component";
 
-interface HistorialADType {
+interface alarmaType {
   id: string;
   fecha: Date;
   usuario: String;
-  HistorialAD: string;
+  alarma: string;
   accion: string;
 }
 export const Activ_desac_historial = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [HistorialAD, setHistorialAD] = useState<HistorialADType | null>();
+  const [alarma, setalarma] = useState<alarmaType | null>();
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
   // Variables de páginado
@@ -36,10 +36,10 @@ export const Activ_desac_historial = () => {
       size={"small"}
       color="success"
       onClick={() => {
-        agregarHistorialADModal();
+        agregaralarmaModal();
       }}
     >
-      <AddCircleIcon /> Añadir HistorialAD
+      <AddCircleIcon /> Añadir alarma
     </Button>,
   ];
   const paginacion = (
@@ -52,61 +52,61 @@ export const Activ_desac_historial = () => {
     />
   );
 
-  const HistorialADsData: HistorialADType[] = [
+  const alarmasData: alarmaType[] = [
     {
       id: "1",
       fecha: new Date("2023/05/26"),
-      HistorialAD: "Alarma 1",
+      alarma: "Alarma 1",
       usuario: "Alan Brito Delgado",
       accion: "Activo",
     },
     {
       id: "1",
       fecha: new Date("2023/05/26"),
-      HistorialAD: "Alarma 1",
+      alarma: "Alarma 1",
       usuario: "Alan Brito Delgado",
       accion: "Activo",
     },
     {
       id: "1",
       fecha: new Date("2023/05/26"),
-      HistorialAD: "Alarma 1",
+      alarma: "Alarma 1",
       usuario: "Alan Brito Delgado",
       accion: "Activo",
     },
     {
       id: "1",
       fecha: new Date("2023/05/26"),
-      HistorialAD: "Alarma 1",
+      alarma: "Alarma 1",
       usuario: "Alan Brito Delgado",
       accion: "Activo",
     },
     {
       id: "1",
       fecha: new Date("2023/05/26"),
-      HistorialAD: "Alarma 1",
+      alarma: "Alarma 1",
       usuario: "Alan Brito Delgado",
       accion: "Activo",
     },
   ];
 
-  const agregarHistorialADModal = () => {
-    setHistorialAD(undefined);
+  const agregaralarmaModal = () => {
+    setalarma(undefined);
     setOpenModal(true);
   };
-  const editarHistorialADModal = (HistorialAD: HistorialADType | undefined) => {
-    setHistorialAD(HistorialAD);
+  const editaralarmaModal = (alarma: alarmaType | undefined) => {
+    setalarma(alarma);
     setOpenModal(true);
   };
 
-  const cerrarHistorialADModal = async () => {
+  const cerraralarmaModal = async () => {
     setOpenModal(false);
-    setHistorialAD(undefined);
+    setalarma(undefined);
     //  await delay(500)
     //  setSistemaEdicion(undefined)
   };
 
-  const obtenerHistorialADsPeticion = async () => {
+  const obteneralarmasPeticion = async () => {
     console.log("obteniendo sistema");
   };
 
@@ -114,40 +114,40 @@ export const Activ_desac_historial = () => {
     { campo: "id_historial", nombre: "ID Historial" },
     { campo: "fecha", nombre: "Fecha" },
     { campo: "usuario", nombre: "Usuario" },
-    { campo: "HistorialAD", nombre: "Alarma" },
+    { campo: "alarma", nombre: "Alarma" },
     { campo: "accion", nombre: "Accion" },
     { campo: "acciones", nombre: "" },
   ];
 
-  const contenidoTabla: Array<Array<ReactNode>> = HistorialADsData.map(
-    (HistorialADData, indexHistorialAD) => [
+  const contenidoTabla: Array<Array<ReactNode>> = alarmasData.map(
+    (alarmaData, indexalarma) => [
       <Typography
-        key={`${HistorialADData.id}-${indexHistorialAD}-id_historial`}
+        key={`${alarmaData.id}-${indexalarma}-id_historial`}
         variant={"body2"}
-      >{`${HistorialADData.id}`}</Typography>,
+      >{`${alarmaData.id}`}</Typography>,
       <Typography
-        key={`${HistorialADData.fecha}-${indexHistorialAD}-fecha`}
+        key={`${alarmaData.fecha}-${indexalarma}-fecha`}
         variant={"body2"}
-      >{`${HistorialADData.fecha}`}</Typography>,
+      >{`${alarmaData.fecha}`}</Typography>,
       <Typography
-        key={`${HistorialADData.id}-${indexHistorialAD}- usuario`}
-        variant={"body2"}
-      >
-        {`${HistorialADData.usuario}`}
-      </Typography>,
-      <Typography
-        key={`${HistorialADData.id}-${indexHistorialAD}- HistorialAD`}
+        key={`${alarmaData.id}-${indexalarma}- usuario`}
         variant={"body2"}
       >
-        {`${HistorialADData.HistorialAD}`}
+        {`${alarmaData.usuario}`}
       </Typography>,
       <Typography
-        key={`${HistorialADData.id}-${indexHistorialAD}- accion`}
+        key={`${alarmaData.id}-${indexalarma}- alarma`}
         variant={"body2"}
       >
-        {`${HistorialADData.accion}`}
+        {`${alarmaData.alarma}`}
       </Typography>,
-      <Grid key={`${HistorialADData.id}-${indexHistorialAD}-accion`}>
+      <Typography
+        key={`${alarmaData.id}-${indexalarma}- accion`}
+        variant={"body2"}
+      >
+        {`${alarmaData.accion}`}
+      </Typography>,
+      <Grid key={`${alarmaData.id}-${indexalarma}-accion`}>
         {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
         <Grid>
           <Button
@@ -157,7 +157,7 @@ export const Activ_desac_historial = () => {
             size={"small"}
             color="error"
             onClick={() => {
-              agregarHistorialADModal();
+              agregaralarmaModal();
             }}
           >
             <Delete />
@@ -173,7 +173,7 @@ export const Activ_desac_historial = () => {
       <Grid item xs={12} sm={12} md={10} lg={10} xl={10} marginTop={"3%"}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>
           <CustomDataTable
-            titulo={"Historial de activación y desactivación de HistorialADs"}
+            titulo={"Historial de activación y desactivación de alarmas"}
             error={!!errorArticulosData}
             cargando={loading}
             acciones={acciones}
