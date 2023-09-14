@@ -1,14 +1,17 @@
-import {
-  Grid,
-  Typography,
-  Button,
-} from "@mui/material";
-import { ReactNode, useState } from "react";
+import { Grid, Typography, Button, Chip, Dialog } from "@mui/material";
+import { ReactNode, useEffect, useState } from "react";
 import { Paginacion } from "../../common/components/ui/Paginacion";
 import { ColumnaType } from "../../common/types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Delete } from "@mui/icons-material";
 import { CustomDataTable } from "../../common/components/ui/CustomDataTable";
+import { HistorialActivarDesactivarType } from "../components/historial-activacion/types/historialActivacionType";
+import axios from "axios";
+import { HistorialType } from "../components/historial-incidentes/types/historialType";
+import { useAlerts } from "../../common/hooks";
+import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
+import { AlertDialog } from "../../common/components/ui";
+import { ModalActivarDesactivar } from "../components/historial-activacion/ModalActivarDesactivar";
 
 //import { ModalalarmaFotos } from "../components/historial-activacion/RowalarmaActivacion.component";
 
@@ -28,18 +31,26 @@ export const Activ_desac_historial = () => {
   const [limite, setLimite] = useState<number>(10);
   const [pagina, setPagina] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
+  const [historialActivarDesactivarData, setHistorialActivarDesactivarData] =
+    useState<HistorialActivarDesactivarType[]>([]);
+  const [historialActivarDesactivar, setHistorialActivarDesactivar] =
+    useState<HistorialActivarDesactivarType | null>();
+  const [mostrarAlertaEliminarHistorial, setMostrarAlertaEliminarHistorial] =
+    useState(false);
+  const [modalHistorial, setModalHistorial] = useState<boolean>(false);
+
   const acciones: Array<ReactNode> = [
     <Button
       variant={"contained"}
       sx={{ ml: 1, mr: 1, textTransform: "none" }}
       key={`accionAgregarArticulo`}
       size={"small"}
-      color="success"
+      color="error"
       onClick={() => {
-        agregaralarmaModal();
+        agregarhistorialModal();
       }}
     >
-      <AddCircleIcon /> Añadir alarma
+      Eliminar historial
     </Button>,
   ];
   const paginacion = (
@@ -51,45 +62,32 @@ export const Activ_desac_historial = () => {
       cambioLimite={setLimite}
     />
   );
+  const { Alerta } = useAlerts();
 
-  const alarmasData: alarmaType[] = [
-    {
-      id: "1",
-      fecha: new Date("2023/05/26"),
-      alarma: "Alarma 1",
-      usuario: "Alan Brito Delgado",
-      accion: "Activo",
-    },
-    {
-      id: "1",
-      fecha: new Date("2023/05/26"),
-      alarma: "Alarma 1",
-      usuario: "Alan Brito Delgado",
-      accion: "Activo",
-    },
-    {
-      id: "1",
-      fecha: new Date("2023/05/26"),
-      alarma: "Alarma 1",
-      usuario: "Alan Brito Delgado",
-      accion: "Activo",
-    },
-    {
-      id: "1",
-      fecha: new Date("2023/05/26"),
-      alarma: "Alarma 1",
-      usuario: "Alan Brito Delgado",
-      accion: "Activo",
-    },
-    {
-      id: "1",
-      fecha: new Date("2023/05/26"),
-      alarma: "Alarma 1",
-      usuario: "Alan Brito Delgado",
-      accion: "Activo",
-    },
-  ];
-
+  /**************************************************************************/
+  const peticionHistorialActivarDesactivar = async () => {
+    console.log("Obteniendo datos");
+    const data = await axios.get(
+      "http://localhost:5000/historialActivarDesactivar"
+    );
+    setHistorialActivarDesactivarData(data.data[0]);
+  };
+  const eliminarHistorialIncidentePeticion = async (
+    historialData: HistorialActivarDesactivarType
+  ) => {
+    //setLoading(true);
+    await axios
+      .patch(
+        `http://localhost:5000/historialActivarDesactivar/${historialActivarDesactivar?.id}/limpiar`
+      )
+      .then((res) => {
+        Alerta({ mensaje: `completado con exito`, variant: "success" });
+      })
+      .catch((err) => {
+        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      });
+  };
+  /**************************************************************************/
   const agregaralarmaModal = () => {
     setalarma(undefined);
     setOpenModal(true);
@@ -119,35 +117,33 @@ export const Activ_desac_historial = () => {
     { campo: "acciones", nombre: "" },
   ];
 
-  const contenidoTabla: Array<Array<ReactNode>> = alarmasData.map(
-    (alarmaData, indexalarma) => [
+  const contenidoTabla: Array<Array<ReactNode>> =
+    historialActivarDesactivarData.map((historialData, index) => [
       <Typography
-        key={`${alarmaData.id}-${indexalarma}-id_historial`}
+        key={`${historialData.id}-${index}-id_historial`}
         variant={"body2"}
-      >{`${alarmaData.id}`}</Typography>,
+      >{`${historialData.id}`}</Typography>,
       <Typography
-        key={`${alarmaData.fecha}-${indexalarma}-fecha`}
+        key={`${historialData.fecha}-${index}-fecha`}
         variant={"body2"}
-      >{`${alarmaData.fecha}`}</Typography>,
+      >{`${historialData.fecha}`}</Typography>,
       <Typography
-        key={`${alarmaData.id}-${indexalarma}- usuario`}
-        variant={"body2"}
-      >
-        {`${alarmaData.usuario}`}
-      </Typography>,
-      <Typography
-        key={`${alarmaData.id}-${indexalarma}- alarma`}
+        key={`${historialData.id}-${index}- usuario`}
         variant={"body2"}
       >
-        {`${alarmaData.alarma}`}
+        {`${historialData.usuario.nombres}   ${historialData.usuario.apellidos}`}
       </Typography>,
       <Typography
-        key={`${alarmaData.id}-${indexalarma}- accion`}
+        key={`${historialData.id}-${index}- alarma`}
         variant={"body2"}
       >
-        {`${alarmaData.accion}`}
+        {`${historialData.alarma.nombre}`}
       </Typography>,
-      <Grid key={`${alarmaData.id}-${indexalarma}-accion`}>
+      <Chip
+        label={historialData.accion}
+        key={`${historialData.id}-${index}- accion`}
+      />,
+      <Grid key={`${historialData.id}-${index}-accion`}>
         {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
         <Grid>
           <Button
@@ -156,8 +152,8 @@ export const Activ_desac_historial = () => {
             key={`accionAgregarArticulo`}
             size={"small"}
             color="error"
-            onClick={() => {
-              agregaralarmaModal();
+            onClick={async () => {
+              await eliminarHistorialModal(historialData);
             }}
           >
             <Delete />
@@ -165,11 +161,66 @@ export const Activ_desac_historial = () => {
         </Grid>
         {/* )} */}
       </Grid>,
-    ]
-  );
+    ]);
+
+  const agregarhistorialModal = () => {
+    setModalHistorial(true);
+  };
+  const cerrarHistorialModalEliminar = async () => {
+    setModalHistorial(false);
+  };
+  const eliminarHistorialModal = async (
+    historial: HistorialActivarDesactivarType
+  ) => {
+    setHistorialActivarDesactivar(historial); // para mostrar datos de articulo en la alerta
+    setMostrarAlertaEliminarHistorial(true); // para mostrar alerta de articulos
+  };
+  const aceptarAlertaEliminarAlarma = async () => {
+    setMostrarAlertaEliminarHistorial(false);
+    if (historialActivarDesactivar) {
+      await eliminarHistorialIncidentePeticion(historialActivarDesactivar);
+    }
+    setHistorialActivarDesactivar(null);
+  };
+  const cancelarAlertaEliminarAlarma = async () => {
+    setMostrarAlertaEliminarHistorial(false);
+    setHistorialActivarDesactivar(null);
+  };
+  const refrescar = async () => {
+    peticionHistorialActivarDesactivar();
+  };
+  useEffect(() => {
+    peticionHistorialActivarDesactivar();
+  }, []);
+
+  useEffect(() => {
+    peticionHistorialActivarDesactivar();
+  }, [historialActivarDesactivar]);
 
   return (
     <Grid container justifyContent={"center"}>
+      <AlertDialog
+        isOpen={mostrarAlertaEliminarHistorial}
+        titulo={"Alerta"}
+        texto={`¿Está seguro de Eliminar el registro de incidente ${historialActivarDesactivar?.id} ?`}
+      >
+        <Button onClick={cancelarAlertaEliminarAlarma}>Cancelar</Button>
+        <Button onClick={aceptarAlertaEliminarAlarma}>Aceptar</Button>
+      </AlertDialog>
+      <Dialog
+        open={modalHistorial}
+        onClose={cerrarHistorialModalEliminar}
+        fullWidth={true}
+        maxWidth={"sm"}
+      >
+        <ModalActivarDesactivar
+          accionCancelar={cerrarHistorialModalEliminar}
+          accionCorrecta={() => {
+            cerrarHistorialModalEliminar().finally();
+            refrescar().finally();
+          }}
+        />
+        </Dialog>
       <Grid item xs={12} sm={12} md={10} lg={10} xl={10} marginTop={"3%"}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>
           <CustomDataTable
