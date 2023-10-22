@@ -24,6 +24,7 @@ import {
 import axios from "axios";
 import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
+import { Constantes } from '../../../config'
 
 interface ModalAlarmaProps {
   alarma?: AlarmaType | null;
@@ -72,7 +73,7 @@ export const ModalAlarma = ({
   const postAlarma = async (elem: AlarmaCRUDType) => {
     console.log("enviado datos");
     const subiendo = await axios
-      .post(`http://localhost:5000/alarmas`, elem)
+      .post(`${Constantes.baseUrl}/alarmas`, elem)
       .then((res) => {
         Alerta({ mensaje: `${InterpreteMensajes(res)}`, variant: "success" });
       })
@@ -83,7 +84,7 @@ export const ModalAlarma = ({
   const patchAlarma = async (elem: AlarmaCRUDType) => {
     console.log("enviado datos");
     const subiendo = await axios
-      .patch(`http://localhost:5000/alarmas/${alarma?.id}`, elem)
+      .patch(`${Constantes.baseUrl}/alarmas/${alarma?.id}`, elem)
       .then((res) => {
         Alerta({ mensaje: `${InterpreteMensajes(res)}`, variant: "success" });
       })

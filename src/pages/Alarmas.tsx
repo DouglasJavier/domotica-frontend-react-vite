@@ -35,6 +35,7 @@ import { Delete, Key } from "@mui/icons-material";
 import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { Constantes } from '../../config'
 
 interface ColumnaType {
   campo: string;
@@ -42,6 +43,9 @@ interface ColumnaType {
 }
 
 export const Activar_desactivar = () => {
+  /* console.log("*************************************************");
+  console.log(Constantes.baseUrl);
+  console.log("*************************************************"); */
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [alarma, setAlarma] = useState<AlarmaType | null>();
   const [alarmasData, setAlarmasData] = useState<AlarmaType[]>([]);
@@ -64,26 +68,34 @@ export const Activar_desactivar = () => {
   /**********************************************************************************/
   const peticionAlarmas = async () => {
     console.log("Obteniendo datos");
-    const data = await axios.get("http://localhost:5000/alarmas");
+    const data = await axios.get(`${Constantes.baseUrl}/alarmas`);
     setAlarmasData(data.data[0]);
   };
   const peticionContactos = async () => {
-    const data = await axios.get("http://localhost:5000/contactos");
+    const data = await axios.get(
+      `${Constantes.baseUrl}/contactos`
+    );
     setContactosData(data.data[0]);
   };
   const peticionUbicaciones = async () => {
-    const data = await axios.get("http://localhost:5000/ubicaciones");
+    const data = await axios.get(
+      `${Constantes.baseUrl}/ubicaciones`
+    );
     setUbicacionesData(data.data[0]);
   };
   const peticionSimuladores = async () => {
-    const data = await axios.get("http://localhost:5000/simuladores");
+    const data = await axios.get(
+      `${Constantes.baseUrl}/simuladores`
+    );
     setSimuladoresData(data.data[0]);
   };
   const cambiarEstadoAlarmaPeticion = async (alarmaData: AlarmaType) => {
     //setLoading(true);
     if (alarma?.estado !== "ENCENDIDO") {
       await axios
-        .patch(`http://localhost:5000/alarmas/${alarma?.id}/encender`)
+        .patch(
+          `${Constantes.baseUrl}/alarmas/${alarma?.id}/encender`
+        )
         .then((res) => {
           Alerta({ mensaje: `completado con exito`, variant: "success" });
           console.log("encendido");
@@ -93,7 +105,9 @@ export const Activar_desactivar = () => {
         });
     } else {
       await axios
-        .patch(`http://localhost:5000/alarmas/${alarma?.id}/apagar`)
+        .patch(
+          `${Constantes.baseUrl}/alarmas/${alarma?.id}/apagar`
+        )
         .then((res) => {
           Alerta({ mensaje: `completado con exito`, variant: "success" });
           console.log("");
@@ -105,15 +119,17 @@ export const Activar_desactivar = () => {
   };
   const eliminarAlarmaPeticion = async (alarmaData: AlarmaType) => {
     //setLoading(true);
-      await axios
-        .patch(`http://localhost:5000/alarmas/${alarma?.id}/eliminar`)
-        .then((res) => {
-          Alerta({ mensaje: `completado con exito`, variant: "success" });
-        })
-        .catch((err) => {
-          Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-        });
-    }
+    await axios
+      .patch(
+        `${Constantes.baseUrl}/alarmas/${alarma?.id}/eliminar`
+      )
+      .then((res) => {
+        Alerta({ mensaje: `completado con exito`, variant: "success" });
+      })
+      .catch((err) => {
+        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      });
+  };
   /**********************************************************************************/
   const acciones: Array<ReactNode> = [
     <Button
@@ -345,7 +361,6 @@ export const Activar_desactivar = () => {
     //await delay(500) // para no mostrar undefined mientras el modal se cierra
     setAlarma(null);
   };
-
   useEffect(() => {
     peticionAlarmas();
     peticionContactos();

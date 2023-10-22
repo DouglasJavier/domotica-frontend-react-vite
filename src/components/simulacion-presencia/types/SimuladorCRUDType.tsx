@@ -10,6 +10,7 @@ export interface SimuladorActuadorType {
 }
 
 export interface ActuadorType {
+  id: string;
   tipo: string;
   descripcion: string;
   ubicacion: UbicacionType;
@@ -20,4 +21,19 @@ interface UbicacionType {
 interface HorarioType {
   horaInicio: string;
   horaFin: string;
+}
+
+export interface SimuladorCRUDType {
+  nombre: string;
+  simuladoresActuadores: SimuladorActuadoCRUDType[];
+  actuadorDropdown: string;
+}
+export interface SimuladorActuadoCRUDType {
+  idActuador: string;
+  actuador: ActuadorType;
+  horarios: HorarioCRUDType[];
+}
+export interface HorarioCRUDType {
+  horaInicio: Date;
+  horaFin: Date;
 }

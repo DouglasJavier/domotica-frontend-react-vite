@@ -3,8 +3,17 @@ import {
   Typography,
   Dialog,
   Button,
+  Card,
+  CardContent,
+  List,
+  ListItem,
+  ListItemText,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Paginacion } from "../../common/components/ui/Paginacion";
 import { ColumnaType } from "../../common/types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -12,36 +21,33 @@ import { Delete, Edit } from "@mui/icons-material";
 import { CustomDataTable } from "../../common/components/ui/CustomDataTable";
 import { ModalSimulador } from "../components/simulacion-presencia/ModalSimulacion";
 import dayjs from "dayjs";
-interface horario {
-  horaInicio: Date;
-  horaFin: Date;
-}
-interface actuadorType {
-  id: string;
-  nombre: string;
-  tipo: string;
-  ubicacion: string;
-}
-interface actuadorSimuladorType {
-  id: string;
-  actuador: actuadorType;
-  horarios: horario[];
-}
-interface simuladorType {
-  id: string;
-  nombre: string;
-  estado: string;
-  actuadoresSimulacion: actuadorSimuladorType[];
-}
+import axios from "axios";
+import {
+  ActuadorType,
+  SimuladorType,
+} from "../components/simulacion-presencia/types/SimuladorCRUDType";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import EditIcon from "@mui/icons-material/Edit";
+import { useAlerts } from "../../common/hooks";
+import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
+import { AlertDialog } from "../../common/components/ui";
+import { Constantes } from '../../config'
+
 export const Simulacion_presencia_conf = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [simulador, setsimulador] = useState<simuladorType | null>();
+  const [simulador, setSimulador] = useState<SimuladorType | null>();
+  const [simuladoresData, setSimuladoresData] = useState<SimuladorType[]>([]);
+  const [actuadoresData, setActuadoresData] = useState<ActuadorType[]>([]);
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
   // Variables de páginado
   const [limite, setLimite] = useState<number>(10);
   const [pagina, setPagina] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
+  const [mostrarAlertaEliminarSimulador, setMostrarAlertaEliminarSimulador] =
+    useState(false);
+  const { Alerta } = useAlerts();
+
   const acciones: Array<ReactNode> = [
     <Button
       variant={"contained"}
@@ -66,210 +72,57 @@ export const Simulacion_presencia_conf = () => {
     />
   );
 
-  const simuladorsData: simuladorType[] = [
-    {
-      id: "1",
-      nombre: "Todos en casa",
-      estado: "ACTIVADO",
-      actuadoresSimulacion: [
-        {
-          id: "1",
-          actuador: {
-            id: "1",
-            nombre: "Foco sala principal",
-            tipo: "foco",
-            ubicacion: "Sala Principal",
-          },
-          horarios: [
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-          ],
-        },
-        {
-          id: "2",
-          actuador: {
-            id: "2",
-            nombre: "Foco cocina",
-            tipo: "foco",
-            ubicacion: "cocina",
-          },
-          horarios: [
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate()},
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate()},
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-          ],
-        },
-        {
-          id: "3",
-          actuador: {
-            id: "3",
-            nombre: "Foco dormitorio",
-            tipo: "foco",
-            ubicacion: "Sala Principal",
-          },
-          horarios: [
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate()},
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-          ],
-        },
-      ],
-    },
-    {
-      id: "2",
-      nombre: "Algunos en casa",
-      estado: "INACTIVO",
-      actuadoresSimulacion: [
-        {
-          id: "1",
-          actuador: {
-            id: "1",
-            nombre: "Foco sala principal",
-            tipo: "foco",
-            ubicacion: "Sala Principal",
-          },
-          horarios: [
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-          ],
-        },
-        {
-          id: "2",
-          actuador: {
-            id: "2",
-            nombre: "Foco cocina",
-            tipo: "foco",
-            ubicacion: "cocina",
-          },
-          horarios: [
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-          ],
-        },
-        {
-          id: "3",
-          actuador: {
-            id: "3",
-            nombre: "Foco dormitorio",
-            tipo: "foco",
-            ubicacion: "Sala Principal",
-          },
-          horarios: [
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-          ],
-        },
-      ],
-    },
-    {
-      id: "3",
-      nombre: "Uno en casa",
-      estado: "INACTIVO",
-      actuadoresSimulacion: [
-        {
-          id: "1",
-          actuador: {
-            id: "1",
-            nombre: "Foco sala principal",
-            tipo: "foco",
-            ubicacion: "Sala Principal",
-          },
-          horarios: [
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate()},
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-          ],
-        },
-        {
-          id: "2",
-          actuador: {
-            id: "2",
-            nombre: "Foco cocina",
-            tipo: "foco",
-            ubicacion: "cocina",
-          },
-          horarios: [
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-          ],
-        },
-        {
-          id: "3",
-          actuador: {
-            id: "3",
-            nombre: "Foco dormitorio",
-            tipo: "foco",
-            ubicacion: "Sala Principal",
-          },
-          horarios: [
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-            { horaInicio: dayjs("2022-04-17T08:30").toDate(), horaFin: dayjs("2022-04-17T08:30").toDate() },
-          ],
-        },
-      ],
-    },
-  ];
-
-  const actuadoresData = [
-    {
-      id: "3",
-      nombre: "Foco dormitorio",
-      tipo: "foco",
-      ubicacion: "Sala Principal",
-    },
-    {
-      id: "2",
-      nombre: "Foco cocina",
-      tipo: "foco",
-      ubicacion: "cocina",
-    },
-    {
-      id: "1",
-      nombre: "Foco sala principal",
-      tipo: "foco",
-      ubicacion: "Sala Principal",
-    }
-  ];
-
   const agregarsimuladorModal = () => {
-    setsimulador(undefined);
+    setSimulador(undefined);
     setOpenModal(true);
   };
-  const editarSimuladorModal = (simulador: simuladorType | undefined) => {
-    setsimulador(simulador);
+  const editarSimuladorModal = (simulador: SimuladorType | undefined) => {
+    setSimulador(simulador);
     setOpenModal(true);
   };
 
   const cerrarSimuladorModal = async () => {
     setOpenModal(false);
-    setsimulador(undefined);
+    setSimulador(undefined);
     //  await delay(500)
     //  setSistemaEdicion(undefined)
   };
-
-  const obtenerSimuladorPeticion = async () => {
-    console.log("obteniendo sistema");
+  /**********************************************************************************/
+  const peticionSimuladores = async () => {
+    console.log("Obteniendo datos");
+    const data = await axios.get(`${Constantes.baseUrl}/simuladores`);
+    setSimuladoresData(data.data[0]);
   };
+
+  const peticionActuadores = async () => {
+    console.log("Obteniendo datos");
+    const data = await axios.get(
+      `${Constantes.baseUrl}/dispositivos/listarActuadores`
+    );
+    setActuadoresData(data.data[0]);
+  };
+
+  const eliminarSimuladorPeticion = async () => {
+    //setLoading(true);
+    await axios
+      .patch(`${Constantes.baseUrl}/simuladores/${simulador?.id}/inactivar`)
+      .then((res) => {
+        Alerta({ mensaje: `completado con exito`, variant: "success" });
+      })
+      .catch((err) => {
+        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      });
+  };
+  /**********************************************************************************/
 
   const columnas: Array<ColumnaType> = [
     { campo: "id_simulador", nombre: "ID Simulador" },
     { campo: "nombre", nombre: "Nombre" },
-    { campo: "estado", nombre: "Estado" },
     { campo: "actuadoresSimulacion", nombre: "Actuadores" },
-    { campo: "ubicaciones", nombre: "Ubicaciones" },
     { campo: "acciones", nombre: "" },
   ];
 
-  const contenidoTabla: Array<Array<ReactNode>> = simuladorsData.map(
+  const contenidoTabla: Array<Array<ReactNode>> = simuladoresData.map(
     (simuladorData, indexsimulador) => [
       <Typography
         key={`${simuladorData.id}-${indexsimulador}-id_simulador`}
@@ -279,42 +132,110 @@ export const Simulacion_presencia_conf = () => {
         key={`${simuladorData.nombre}-${indexsimulador}-nombre`}
         variant={"body2"}
       >{`${simuladorData.nombre}`}</Typography>,
-      <Typography
-        key={`${simuladorData.id}-${indexsimulador}- estado`}
-        variant={"body2"}
+      <>
+        <List>
+          {simuladorData.simuladoresActuadores.map((actuador, index) => (
+            <ListItem key={actuador.actuador + " " + index}>
+              <Accordion sx={{ width: "100%" }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="subtitle2">
+                    {actuador.actuador.descripcion}
+                  </Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    - Ubicación: {actuador.actuador.ubicacion.nombre}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    Horarios:
+                  </Typography>
+                  <List>
+                    {actuador.horarios.map((horario, index) => (
+                      <ListItem key={index}>
+                        <Chip
+                          label={`${dayjs(horario.horaInicio).format(
+                            "HH:mm"
+                          )} - ${dayjs(horario.horaFin).format("HH:mm")}`}
+                          size="small"
+                          color="primary"
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </AccordionDetails>
+              </Accordion>
+            </ListItem>
+          ))}
+        </List>
+      </>,
+      <Grid
+        key={`${simuladorData?.id}-${indexsimulador}-accion`}
+        flexDirection={"column"}
+        alignContent={"center"}
+        alignItems={"center"}
       >
-        {`${simuladorData.estado}`}
-      </Typography>,
-      <>
-        {simuladorData.actuadoresSimulacion.map((actua) => {
-          return <p> {actua.actuador.nombre} </p>;
-        })}
-      </>,
-      <>
-        {simuladorData.actuadoresSimulacion.map((actua) => {
-          return <p> {actua.actuador.ubicacion} </p>;
-        })}
-      </>,
-      <Grid key={`${simuladorData.id}-${indexsimulador}-accion`}>
         {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
         <Grid>
           <Button
             variant={"text"}
             sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionAgregarArticulo`}
+            key={`${simuladorData.id}-${indexsimulador}-accionEditar`}
             size={"small"}
             onClick={() => {
               editarSimuladorModal(simuladorData);
             }}
           >
-            <Edit />
+            <EditIcon />
           </Button>
         </Grid>
-        {/* )} */}
+        <Grid>
+          <Button
+            variant={"text"}
+            sx={{ ml: 1, mr: 1, textTransform: "none" }}
+            key={`accionSimuladorAlarma`}
+            size={"small"}
+            color="error"
+            onClick={async () => {
+              await eliminarSimuladorModal(simuladorData);
+            }}
+          >
+            <Delete />
+          </Button>
+        </Grid>
       </Grid>,
     ]
   );
 
+  const eliminarSimuladorModal = async (simuladorData: SimuladorType) => {
+    setSimulador(simuladorData); // para mostrar datos de articulo en la alerta
+    setMostrarAlertaEliminarSimulador(true); // para mostrar alerta de articulos
+  };
+
+  const aceptarAlertaEliminarAlarma = async () => {
+    setMostrarAlertaEliminarSimulador(false);
+    if (simulador) {
+      await eliminarSimuladorPeticion();
+    }
+    setSimulador(null);
+  };
+  /// Método que cierra alerta de cambio de estado
+
+  const cancelarAlertaEliminarAlarma = async () => {
+    setMostrarAlertaEliminarSimulador(false);
+    //await delay(500) // para no mostrar undefined mientras el modal se cierra
+    setSimulador(null);
+  };
+
+  useEffect(() => {
+    peticionSimuladores();
+    peticionActuadores();
+  }, []);
+  useEffect(() => {
+    peticionSimuladores();
+  }, [simulador]);
+  const refrescar = async () => {
+    peticionSimuladores();
+  };
   return (
     <>
       <Dialog
@@ -329,10 +250,18 @@ export const Simulacion_presencia_conf = () => {
           accionCancelar={cerrarSimuladorModal}
           accionCorrecta={() => {
             cerrarSimuladorModal().finally();
-            //obtenerAlarmasPeticion();
+            refrescar().finally();
           }}
         />
       </Dialog>
+      <AlertDialog
+        isOpen={mostrarAlertaEliminarSimulador}
+        titulo={"Alerta"}
+        texto={`¿Está seguro de Eliminar el simulador de presencia  ${simulador?.nombre} ?`}
+      >
+        <Button onClick={cancelarAlertaEliminarAlarma}>Cancelar</Button>
+        <Button onClick={aceptarAlertaEliminarAlarma}>Aceptar</Button>
+      </AlertDialog>
       <Grid container justifyContent={"center"}>
         <Grid item xs={12} sm={12} md={10} lg={11} xl={11} marginTop={"3%"}>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>

@@ -4,33 +4,16 @@ import {
   DialogActions,
   DialogTitle,
   Paper,
+  Card,
+  CardMedia,
 } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import { FotoType } from "./types/historialType";
-
-interface HistorialType {
-  id: string;
-  fecha: Date;
-  ubicacion: string;
-  detalles: string;
-  fotos: string[];
-}
-
+import { Constantes } from '../../../config'
 interface ModalAlarmaProps {
   Fotos?: FotoType[] | null;
   accionCancelar: () => void;
 }
-var items = [
-  {
-    name: "Random Name #1",
-    description: "Probably the most random thing you have ever seen!",
-  },
-  {
-    name: "Random Name #2",
-    description: "Hello World!",
-  },
-];
-
 export const ModalHistorialFotos = ({
   Fotos,
   accionCancelar,
@@ -40,8 +23,8 @@ export const ModalHistorialFotos = ({
       <DialogTitle>{"Registro de Fotos del incidente"}</DialogTitle>
       <DialogContent dividers>
         <Carousel>
-          {items.map((item, i) => (
-            <Item key={i} noticia={item} />
+          {Fotos?.map((item, i) => (
+            <Item key={i} foto={item} />
           ))}
         </Carousel>
       </DialogContent>
@@ -65,32 +48,23 @@ export const ModalHistorialFotos = ({
   );
 };
 interface ItemProps {
-  noticia: {
-    name: string;
-    description: string;
+  foto: {
+    id: string;
+    foto: string;
   };
 }
-function Item({ noticia }: ItemProps) {
+function Item({ foto }: ItemProps) {
   return (
     <Paper>
-      <h2>{noticia.name}</h2>
-      <p>{noticia.description}</p>
-
-      <Button className="CheckButton">Check it out!</Button>
-      {/* <Card >
+      <Card>
         <CardMedia
-            component="img"
-            height="350"
-            image={noticia.imagen}
-          /> 
-        
-      </Card> */}
-      {/* <img src={noticia.imagen} alt={noticia.titulo} /> */}
-      {/* <h2>{noticia.titulo}</h2>
-
-        <Button variant="contained" color="info" className="CheckButton">
-          Check it out!
-        </Button> */}
+          component="img"
+          height="500"
+          image={`${Constantes.baseUrl}/historialIncidentes/fotos/${foto.foto}`}
+        />
+      </Card>
+      
+      
     </Paper>
   );
 }

@@ -25,7 +25,16 @@ import dayjs from "dayjs";
 import { FormInputSwitch } from "../../../common/components/ui/form/FormInputSwitch";
 import { useEffect, useState } from "react";
 import { FormInputTime } from "../../../common/components/ui/form/FormInputTime";
-interface horario {
+import {
+  ActuadorType,
+  SimuladorCRUDType,
+  SimuladorType,
+} from "./types/SimuladorCRUDType";
+import { useAlerts } from "../../../common/hooks";
+import axios from "axios";
+import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
+import { Constantes } from '../../../config'
+/* interface horario {
   horaInicio: Date;
   horaFin: Date;
 }
@@ -40,18 +49,18 @@ interface actuadorSimuladorType {
   actuador: actuadorType;
   horarios: horario[];
 }
-interface simuladorCRUDType {
+interface SimuladorCRUDType {
   id: string;
   nombre: string;
   estado: string;
-  actuadoresSimulacion: actuadorSimuladorType[];
+  simuladoresActuadores: actuadorSimuladorType[];
 }
 
 interface CrearEditarSimuladorCRUDType {
   id: string;
   nombre: string;
   estado: string;
-  actuadoresSimulacion: actuadorSimuladorType[];
+  simuladoresActuadores: actuadorSimuladorType[];
   actuadorDropdown: string;
 }
 
@@ -60,11 +69,11 @@ interface actuadorType {
   nombre: string;
   tipo: string;
   ubicacion: string;
-}
+} */
 
 interface ModalSimulacionProps {
-  simulacion?: simuladorCRUDType | null;
-  actuadores: actuadorType[];
+  simulacion?: SimuladorType | null;
+  actuadores: ActuadorType[];
   accionCancelar: () => void;
   accionCorrecta: () => void;
 }
@@ -75,13 +84,27 @@ export const ModalSimulador = ({
   accionCancelar,
   accionCorrecta,
 }: ModalSimulacionProps) => {
+  const { Alerta } = useAlerts();
+
   const { handleSubmit, control, watch, setValue, getValues } =
-    useForm<CrearEditarSimuladorCRUDType>({
+    useForm<SimuladorCRUDType>({
       defaultValues: {
-        id: simulacion?.id,
-        nombre: simulacion?.nombre,
-        estado: simulacion?.estado,
-        actuadoresSimulacion: simulacion?.actuadoresSimulacion,
+        nombre: simulacion?.nombre || "",
+        simuladoresActuadores: simulacion
+          ? simulacion?.simuladoresActuadores.map((actuador) => {
+              return {
+                idActuador: actuador?.idActuador || "",
+                actuador: actuador.actuador,
+                horarios:
+                  actuador?.horarios?.map((horario) => {
+                    return {
+                      horaInicio: dayjs(horario?.horaInicio).toDate(),
+                      horaFin: dayjs(horario?.horaFin).toDate(),
+                    };
+                  }) || [], // Asegúrate de manejar el caso en el que no haya horarios
+              };
+            })
+          : [],
         actuadorDropdown: "",
       },
     });
@@ -89,14 +112,7 @@ export const ModalSimulador = ({
 
   const [defaultActuadorData, setDefaultActuadorData] =
     useState<optionType>(defaultOption);
-  const guardarActualizarSimulador = async (data: simuladorCRUDType) => {
-    await guardarActualizarSimuladorPeticion(data);
-  };
-  const guardarActualizarSimuladorPeticion = async (
-    alarma: simuladorCRUDType
-  ) => {
-    console.log(alarma);
-  };
+  
   const {
     fields: fieldsActuadores,
     append: appendActuadores,
@@ -104,33 +120,33 @@ export const ModalSimulador = ({
     update: updateActuadores,
   } = useFieldArray({
     control,
-    name: "actuadoresSimulacion",
+    name: "simuladoresActuadores",
   });
   const agregarActuadorSimulador = async (
-    actuadorSeleccionado: actuadorType
+    actuadorSeleccionado: ActuadorType
   ) => {
-    const existeActuador = getValues().actuadoresSimulacion.find(
+    const existeActuador = getValues().simuladoresActuadores.find(
       (actuadorSimulador) =>
-        actuadorSimulador.actuador.id === actuadorSeleccionado.id
+        actuadorSimulador.idActuador === actuadorSeleccionado.id
     );
 
     if (existeActuador) {
-      /* return Alerta({
+      return Alerta({
         mensaje: "Ya se agregó el actuador",
         variant: "info",
-      }); */
+      });
     } else {
       const nuevoActuadorSimulador = actuadores.find(
         (actuador) => actuador.id === actuadorSeleccionado.id
       );
       if (!nuevoActuadorSimulador) {
-        /* Alerta({
-          mensaje: "Artículo no existe",
+        Alerta({
+          mensaje: "El actuador no existe",
           variant: "error",
-        }); */
+        });
       } else {
         appendActuadores({
-          id: actuadorSeleccionado?.id + "",
+          idActuador: actuadorSeleccionado?.id + "",
           actuador: actuadorSeleccionado,
           horarios: [
             {
@@ -150,8 +166,8 @@ export const ModalSimulador = ({
 
     updateActuadores(index, {
       horarios: [...fieldsActuadores[index].horarios, horario],
-      id: fieldsActuadores[index].id,
-      actuador: fieldsActuadores[index].actuador,
+      idActuador: fieldsActuadores[index].idActuador,
+      actuador: fieldsActuadores[index].actuador
     });
   };
   const eliminarHorario = (index: number, index2: number) => {
@@ -159,8 +175,8 @@ export const ModalSimulador = ({
     const a = horarios.splice(index2, 1);
     updateActuadores(index, {
       horarios: horarios,
-      id: fieldsActuadores[index].id,
-      actuador: fieldsActuadores[index].actuador,
+      idActuador: fieldsActuadores[index].idActuador,
+      actuador: fieldsActuadores[index].actuador
     });
   };
   const actualizarHorarioInicio = (index: number, index2: number, e: Date) => {
@@ -178,6 +194,38 @@ export const ModalSimulador = ({
       ...fieldsActuadores[index],
       horarios: horarios,
     });
+  };
+  const guardarActualizarSimulador = async (data: SimuladorCRUDType) => {
+    if (simulacion) {
+      await patchSimuladorPeticion(data);
+      accionCorrecta();
+    } else {
+      await postSimuladorPeticion(data);
+      accionCorrecta();
+    }
+  };
+ 
+  const postSimuladorPeticion = async (elem: SimuladorCRUDType) => {
+    console.log("enviado datos");
+    const subiendo = await axios
+      .post(`${Constantes.baseUrl}/simuladores`, elem)
+      .then((res) => {
+        Alerta({ mensaje: `completado con exito`, variant: "success" });
+      })
+      .catch((err) => {
+        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      });
+  };
+  const patchSimuladorPeticion = async (elem: SimuladorCRUDType) => {
+    console.log("enviado datos");
+    const subiendo = await axios
+      .patch(`${Constantes.baseUrl}/simuladores/${simulacion?.id}`, elem)
+      .then((res) => {
+        Alerta({ mensaje: `completado con exito`, variant: "success" });
+      })
+      .catch((err) => {
+        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      });
   };
 
   const theme = useTheme();
@@ -206,12 +254,12 @@ export const ModalSimulador = ({
               id={"simulador"}
               name="actuadorDropdown"
               control={control}
-              label="Activar simulación de presencia:"
-              defaultValue={defaultActuadorData}
+              label="Activar simulación de presencia en:"
+              //defaultValue={defaultActuadorData}
               options={actuadores.map((actuador) => ({
                 key: actuador.id,
                 value: actuador.id,
-                label: actuador.nombre,
+                label: actuador.descripcion + ' - ' + actuador.ubicacion.nombre,
               }))}
               //rules={{ required: "Este campo es requerido" }}
               onChange={(e) => {
@@ -235,7 +283,7 @@ export const ModalSimulador = ({
                 <TableHead>
                   <TableRow>
                     <TableCell colSpan={4}>
-                      <b>{`${actuador.actuador.nombre} ${actuador.actuador.ubicacion}`}</b>
+                      <b>{`${actuador.actuador.descripcion} ${actuador.actuador.ubicacion.nombre}`}</b>
                     </TableCell>
                     <TableCell sx={{ maxWidth: "100px" }}>
                       <Button
@@ -253,25 +301,29 @@ export const ModalSimulador = ({
                       <>
                         <TableRow>
                           <TableCell colSpan={4}>
-                            <Grid container direction={"column"} justifyContent={"space-between"}>
-                              <Grid item >
+                            <Grid
+                              container
+                              direction={"column"}
+                              justifyContent={"space-between"}
+                            >
+                              <Grid item>
                                 <FormInputTime
-                                  id={`actuadoresSimulacion.${index} `}
+                                  id={`simuladoresActuadores.${index} `}
                                   control={control}
                                   value={actuador.horarios[index2].horaInicio}
-                                  name={`actuadoresSimulacion.${index}.horarios.${index2}.horaInicio`}
+                                  name={`simuladoresActuadores.${index}.horarios.${index2}.horaInicio`}
                                   label="Hora inicio"
                                   onChange={(e) => {
                                     actualizarHorarioInicio(index, index2, e);
                                   }}
                                 />
                               </Grid>
-                              <Grid item  marginTop={'8px'}>
+                              <Grid item marginTop={"8px"}>
                                 <FormInputTime
                                   id={`ingresoArticulo[${index}].id `}
                                   control={control}
                                   value={actuador.horarios[index2].horaFin}
-                                  name={`actuadoresSimulacion.${index}.horarios.${index2}.horaFin`}
+                                  name={`simuladoresActuadores.${index}.horarios.${index2}.horaFin`}
                                   label="Hora fin"
                                   onChange={(e) => {
                                     actualizarHorarioFin(index, index2, e);
@@ -298,10 +350,10 @@ export const ModalSimulador = ({
                         <TableCell>Hora inicio</TableCell>
                         <TableCell>
                           <FormInputTime
-                            id={`actuadoresSimulacion.${index} `}
+                            id={`simuladoresActuadores.${index} `}
                             control={control}
                             value={actuador.horarios[index2].horaInicio}
-                            name={`actuadoresSimulacion.${index}.horarios.${index2}.horaInicio`}
+                            name={`simuladoresActuadores.${index}.horarios.${index2}.horaInicio`}
                             label=""
                             onChange={(e) => {
                               actualizarHorarioInicio(index, index2, e);
@@ -314,7 +366,7 @@ export const ModalSimulador = ({
                             id={`ingresoArticulo[${index}].id `}
                             control={control}
                             value={actuador.horarios[index2].horaFin}
-                            name={`actuadoresSimulacion.${index}.horarios.${index2}.horaFin`}
+                            name={`simuladoresActuadores.${index}.horarios.${index2}.horaFin`}
                             label=""
                             onChange={(e) => {
                               actualizarHorarioFin(index, index2, e);
@@ -360,7 +412,7 @@ export const ModalSimulador = ({
         }}
       >
         <Button variant="contained" color="success" type="submit">
-          Crear alarma
+          {simulacion ? 'Editar Simulador' : 'Crear Simulador'} 
         </Button>
         <Button variant="contained" color="error" onClick={accionCancelar}>
           Salir

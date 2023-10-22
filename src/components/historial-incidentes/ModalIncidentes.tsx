@@ -18,6 +18,7 @@ import axios from "axios";
 import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import dayjs from "dayjs";
+import { Constantes } from '../../../config'
 
 interface IntervaloFechaType {
   fechaInicio: string;
@@ -54,7 +55,7 @@ export const ModalIncidente = ({
       //setLoading(true);
       await axios
         .patch(
-          `http://localhost:5000/historialIncidentes/limpiarPorFecha`, 
+          `${Constantes.baseUrl}/historialIncidentes/limpiarPorFecha`, 
             {
               fechaInicio: dayjs(getValues().fechaInicio).format('DD/MM/YYYY'),
               fechaFin: dayjs(getValues().fechaFin).format('DD/MM/YYYY')

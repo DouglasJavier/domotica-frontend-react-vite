@@ -12,6 +12,7 @@ import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { AlertDialog } from "../../common/components/ui";
 import { ModalActivarDesactivar } from "../components/historial-activacion/ModalActivarDesactivar";
+import { Constantes } from '../../config'
 
 //import { ModalalarmaFotos } from "../components/historial-activacion/RowalarmaActivacion.component";
 
@@ -68,7 +69,7 @@ export const Activ_desac_historial = () => {
   const peticionHistorialActivarDesactivar = async () => {
     console.log("Obteniendo datos");
     const data = await axios.get(
-      "http://localhost:5000/historialActivarDesactivar"
+      `${Constantes.baseUrl}/historialActivarDesactivar`
     );
     setHistorialActivarDesactivarData(data.data[0]);
   };
@@ -78,7 +79,7 @@ export const Activ_desac_historial = () => {
     //setLoading(true);
     await axios
       .patch(
-        `http://localhost:5000/historialActivarDesactivar/${historialActivarDesactivar?.id}/limpiar`
+        `${Constantes.baseUrl}/historialActivarDesactivar/${historialActivarDesactivar?.id}/limpiar`
       )
       .then((res) => {
         Alerta({ mensaje: `completado con exito`, variant: "success" });

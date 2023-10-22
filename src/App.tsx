@@ -15,6 +15,7 @@ import { Default } from "./pages/Default";
 import { useTheme } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
 import { SnackbarProvider } from "notistack";
+import { Ubicaciones_conf } from "./pages/Ubicaciones";
 
 interface MenuSide {
   sideMenuOpen: boolean;
@@ -71,6 +72,7 @@ function App() {
               <Route path="config_contactos" element={<Contactos_conf />} />
               <Route path="config_disp" element={<Dispositivos_conf />} />
               <Route path="config_usuarios" element={<Usuarios_conf />} />
+              <Route path="config_ubicaciones" element={<Ubicaciones_conf />} />
               <Route path="*" element={<Default />} />
             </Route>
           </Routes>

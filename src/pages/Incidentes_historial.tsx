@@ -11,6 +11,8 @@ import { HistorialType } from "../components/historial-incidentes/types/historia
 import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { ModalIncidente } from "../components/historial-incidentes/ModalIncidentes";
+import { Constantes } from '../../config'
+
 
 export const Incidentes_historial = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -57,7 +59,7 @@ export const Incidentes_historial = () => {
   /**************************************************************************/
   const peticionHistorialIncidentes = async () => {
     console.log("Obteniendo datos");
-    const data = await axios.get("http://localhost:5000/historialIncidentes");
+    const data = await axios.get(`${Constantes.baseUrl}/historialIncidentes`);
     setHistorialIncidentesData(data.data[0]);
   };
   const eliminarHistorialIncidentePeticion = async (
@@ -66,7 +68,7 @@ export const Incidentes_historial = () => {
     //setLoading(true);
     await axios
       .patch(
-        `http://localhost:5000/historialIncidentes/${historialIncidente?.id}/limpiar`
+        `${Constantes.baseUrl}/historialIncidentes/${historialIncidente?.id}/limpiar`
       )
       .then((res) => {
         Alerta({ mensaje: `completado con exito`, variant: "success" });
@@ -214,7 +216,7 @@ export const Incidentes_historial = () => {
         open={openModal}
         onClose={cerrarFotoModal}
         fullWidth={true}
-        maxWidth={"sm"}
+        maxWidth={"md"}
       >
         <ModalHistorialFotos
           Fotos={incidentes?.fotos}

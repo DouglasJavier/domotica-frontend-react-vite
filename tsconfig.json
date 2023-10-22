@@ -14,7 +14,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+      // Otras configuraciones...
   },
   "include": ["src", "common"],
   "references": [{ "path": "./tsconfig.node.json" }]

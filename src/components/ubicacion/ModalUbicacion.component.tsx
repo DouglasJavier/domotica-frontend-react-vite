@@ -13,7 +13,7 @@ import {
   optionType,
 } from "../../../common/components/ui/form";
 import { useState } from "react";
-import { UsuarioType } from "./types/usuarioCRUDType";
+import { UbicacionType } from "./types/ubicacionCRUDType";
 import axios from "axios";
 import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
@@ -21,24 +21,21 @@ import { AlertDialog } from "../../../common/components/ui";
 import { Constantes } from '../../../config'
 
 interface ModalSimulacionProps {
-  usuario?: UsuarioType | null;
+  ubicacion?: UbicacionType | null;
   accionCancelar: () => void;
   accionCorrecta: () => void;
 }
 
-export const ModalUsuario = ({
-  usuario,
+export const ModalUbicacion = ({
+  ubicacion,
   accionCancelar,
   accionCorrecta,
 }: ModalSimulacionProps) => {
   const { handleSubmit, control, watch, setValue, getValues } =
-    useForm<UsuarioType>({
+    useForm<UbicacionType>({
       defaultValues: {
-        id: usuario?.id,
-        nombres: usuario?.nombres,
-        apellidos: usuario?.apellidos,
-        usuario: usuario?.usuario,
-        rol: usuario?.rol,
+        id: ubicacion?.id,
+        nombre: ubicacion?.nombre,
       },
     });
     const { Alerta } = useAlerts();
@@ -47,20 +44,20 @@ export const ModalUsuario = ({
   console.log("*******************************************");
   const defaultOption = { key: "", value: "", label: "" };
 
-  const guardarActualizarUsuario = async (data: UsuarioType) => {
-    if (usuario) {
-      await patchUsuarioPeticion(data);
+  const guardarActualizarUbicacion = async (data: UbicacionType) => {
+    if (ubicacion) {
+      await patchUbicacionPeticion(data);
       accionCorrecta();
     } else {
-      await postUsuarioPeticion(data);
+      await postUbicacionPeticion(data);
       accionCorrecta();
     }
   };
 
-  const postUsuarioPeticion = async (elem: UsuarioType) => {
+  const postUbicacionPeticion = async (elem: UbicacionType) => {
     console.log("enviado datos");
     const subiendo = await axios
-      .post(`${Constantes.baseUrl}/usuarios`, elem)
+      .post(`${Constantes.baseUrl}/ubicaciones`, elem)
       .then((res) => {
         Alerta({ mensaje: `completado con exito`, variant: "success" });
       })
@@ -68,10 +65,10 @@ export const ModalUsuario = ({
         Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
       });
   };
-  const patchUsuarioPeticion = async (elem: UsuarioType) => {
+  const patchUbicacionPeticion = async (elem: UbicacionType) => {
     console.log("enviado datos");
     const subiendo = await axios
-      .patch(`${Constantes.baseUrl}/usuarios/${usuario?.id}`, elem)
+      .patch(`${Constantes.baseUrl}/ubicaciones/${ubicacion?.id}`, elem)
       .then((res) => {
         Alerta({ mensaje: `completado con exito`, variant: "success" });
       })
@@ -84,64 +81,20 @@ export const ModalUsuario = ({
     useState<optionType>(defaultOption);
 
   return (
-    <form onSubmit={handleSubmit(guardarActualizarUsuario)}>
+    <form onSubmit={handleSubmit(guardarActualizarUbicacion)}>
       <DialogTitle>
-        {usuario ? "Editar usuario" : "Agregar nuevo usuario"}
+        {ubicacion ? "Editar ubicacion" : "Agregar nuevo ubicacion"}
       </DialogTitle>
       <DialogContent dividers>
         <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
-          <Grid item xs={12} sm={6} md={6}>
+          <Grid item xs={12} sm={12} md={12}>
             <FormInputText
               id={"nombre"}
               control={control}
-              name="nombres"
-              label="Nombre del usuario"
+              name="nombre"
+              label="Nombre de la ubicacion"
               // disabled={loadingModal}
               rules={{ required: "Este campo es requerido" }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6}>
-            <FormInputText
-              id={"apellidos"}
-              control={control}
-              name="apellidos"
-              label="Apellidos del usuario"
-              // disabled={loadingModal}
-              rules={{ required: "Este campo es requerido" }}
-            />
-          </Grid>
-        </Grid>
-        <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
-          <Grid item xs={12} sm={6} md={6}>
-            <FormInputText
-              id={"direccionLan"}
-              control={control}
-              name="usuario"
-              label="Usuario"
-              // disabled={loadingModal}
-              rules={{ required: "Este campo es requerido" }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6}>
-            <FormInputDropdown
-              id={"direccionWan"}
-              control={control}
-              name="rol"
-              label="Rol"
-              //directionColumn={true}
-              options={[
-                {
-                  key: "ADMINISTRADOR",
-                  value: "ADMINISTRADOR",
-                  label: "Administrador",
-                },
-                {
-                  key: "USUARIO",
-                  value: "USUARIO",
-                  label: "Usuario",
-                },
-              ]}
-              // disabled={loadingModal}
             />
           </Grid>
         </Grid>
@@ -159,7 +112,7 @@ export const ModalUsuario = ({
         }}
       >
         <Button variant="contained" color="success" type="submit">
-          {usuario ? 'Editar Usuario' : 'Añadir Usuario' }
+          {ubicacion ? 'Editar Ubicacion' : 'Añadir Ubicacion' }
         </Button>
         <Button variant="contained" color="error" onClick={accionCancelar}>
           Salir

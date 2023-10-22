@@ -13,56 +13,32 @@ import {
   FormInputDropdownMultiple,
 } from "../../../common/components/ui/form";
 import { useState } from "react";
-
-interface AlarmaType {
-  id: string;
-  nombre: string;
-  sonido: boolean;
-  notificacion: boolean;
-  envio_noti: string;
-  contactos: string[];
-  simulador: string;
-  ubicaciones: string[];
-  tipo: string[];
-}
-interface ContactoType {
-  id: string;
-  nombre: string;
-  apellido: string;
-  numero_Tel1: String;
-  numero_Tel2?: String;
-  alarmas: AlarmaType[];
-}
-interface ContactoCRUDType {
-  id: string;
-  nombre: string;
-  apellido: string;
-  numero_Tel1: String;
-  numero_Tel2?: String;
-  alarmas: string[];
-}
+import { ContactoCRUDType, ContactoType } from "./types/contactosCRUDType";
+import axios from "axios";
+import { useAlerts } from "../../../common/hooks";
+import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
+import { Constantes } from '../../../config'
 interface ModalContactoProps {
   contacto?: ContactoType | null;
-  alarmas: AlarmaType[];
   accionCancelar: () => void;
   accionCorrecta: () => void;
 }
 
 export const ModalContacto = ({
   contacto,
-  alarmas,
   accionCancelar,
   accionCorrecta,
 }: ModalContactoProps) => {
+  const { Alerta } = useAlerts();
+
   const { handleSubmit, control, watch, setValue, getValues } =
     useForm<ContactoCRUDType>({
       defaultValues: {
         id: contacto?.id,
         nombre: contacto?.nombre,
         apellido: contacto?.apellido,
-        numero_Tel1: contacto?.numero_Tel1,
-        numero_Tel2: contacto?.numero_Tel2,
-        alarmas: contacto?.alarmas.map((alarma)=>(alarma.id)),
+        numeroTel1: contacto?.numeroTel1,
+        numeroTel2: contacto?.numeroTel2
       },
     });
   const defaultOption = { key: "", value: "", label: "" };
@@ -70,10 +46,35 @@ export const ModalContacto = ({
   const [defaultActuadorData, setDefaultActuadorData] =
     useState<optionType>(defaultOption);
   const guardarActualizarContacto = async (data: ContactoCRUDType) => {
-    await guardarActualizarContactoPeticion(data);
+    if (contacto) {
+      await patchContactoPeticion(data);
+      accionCorrecta();
+    } else {
+      await postContactoPeticion(data);
+      accionCorrecta();
+    }
   };
-  const guardarActualizarContactoPeticion = async (alarma: ContactoCRUDType) => {
-    console.log(alarma);
+  const postContactoPeticion = async (elem: ContactoCRUDType) => {
+    console.log("enviado datos");
+    const subiendo = await axios
+      .post(`${Constantes.baseUrl}/contactos`, elem)
+      .then((res) => {
+        Alerta({ mensaje: `completado con exito`, variant: "success" });
+      })
+      .catch((err) => {
+        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      });
+  };
+  const patchContactoPeticion = async (elem: ContactoCRUDType) => {
+    console.log("enviado datos");
+    const subiendo = await axios
+      .patch(`${Constantes.baseUrl}/contactos/${contacto?.id}`, elem)
+      .then((res) => {
+        Alerta({ mensaje: `completado con exito`, variant: "success" });
+      })
+      .catch((err) => {
+        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      });
   };
   return (
     <form onSubmit={handleSubmit(guardarActualizarContacto)}>
@@ -108,7 +109,7 @@ export const ModalContacto = ({
             <FormInputText
               id={"nombre"}
               control={control}
-              name="numero_Tel1"
+              name="numeroTel1"
               label="Numero telefónico principal"
               // disabled={loadingModal}
               rules={{ required: "Este campo es requerido" }}
@@ -118,26 +119,10 @@ export const ModalContacto = ({
             <FormInputText
               id={"apellido"}
               control={control}
-              name="numero_Tel2"
+              name="numeroTel2"
               label="Numero telefónico secundario"
               // disabled={loadingModal}
               //rules={{ required: "Este campo es requerido" }}
-            />
-          </Grid>
-        </Grid>
-        <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
-          <Grid item xs={12} sm={12} md={6}>
-            <FormInputDropdownMultiple
-              id={"contactos"}
-              name="alarmas"
-              control={control}
-              label="Contactos a notificar:"
-              options={alarmas.map((alarma) => ({
-                key: alarma.id,
-                value: alarma.id,
-                label: alarma.nombre,
-              }))}
-              rules={{ required: "Este campo es requerido" }}
             />
           </Grid>
         </Grid>
@@ -155,7 +140,7 @@ export const ModalContacto = ({
         }}
       >
         <Button variant="contained" color="success" type="submit">
-          Crear alarma
+          {contacto ? 'Editar' : 'Crear'}
         </Button>
         <Button variant="contained" color="error" onClick={accionCancelar}>
           Salir

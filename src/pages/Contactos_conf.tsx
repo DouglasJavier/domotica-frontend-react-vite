@@ -1,39 +1,30 @@
 import { Grid, Typography, Button, Chip, Stack, Dialog } from "@mui/material";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Paginacion } from "../../common/components/ui/Paginacion";
 import { ColumnaType } from "../../common/types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Delete, Edit } from "@mui/icons-material";
 import { CustomDataTable } from "../../common/components/ui/CustomDataTable";
 import { ModalContacto } from "../components/contactos/ModalContactos";
+import { ContactoType } from "../components/contactos/types/contactosCRUDType";
+import axios from "axios";
+import { useAlerts } from "../../common/hooks";
+import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
+import { AlertDialog } from "../../common/components/ui";
+import { Constantes } from '../../config'
 
 //import { ModalContactoFotos } from "../components/contacto-activacion/RowContactoActivacion.component";
-
-interface AlarmaType {
-  id: string;
-  nombre: string;
-  sonido: boolean;
-  notificacion: boolean;
-  envio_noti: string;
-  contactos: string[];
-  simulador: string;
-  ubicaciones: string[];
-  tipo: string[];
-}
-interface ContactoType {
-  id: string;
-  nombre: string;
-  apellido: string;
-  numero_Tel1: String;
-  numero_Tel2?: String;
-  alarmas: AlarmaType[];
-}
-
 export const Contactos_conf = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [contacto, setContacto] = useState<ContactoType | null>();
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [contactosData, setContactosData] = useState<ContactoType[]>([]);
+  const [mostrarAlertaEliminarContacto, setMostrarAlertaEliminarContacto] =
+    useState(false);
+
+  const { Alerta } = useAlerts();
+
   // Variables de páginado
   const [limite, setLimite] = useState<number>(10);
   const [pagina, setPagina] = useState<number>(1);
@@ -61,96 +52,6 @@ export const Contactos_conf = () => {
       cambioLimite={setLimite}
     />
   );
-  const alarmasData: AlarmaType[] = [
-    {
-      id: "1",
-      nombre: "Alarma 1",
-      sonido: true,
-      notificacion: true,
-      envio_noti: "1",
-      contactos: ["1", "2", "3"],
-      simulador: "1",
-      ubicaciones: ["1", "2", "3", "4"],
-      tipo: ["1", "2"],
-    },
-    {
-      id: "2",
-      nombre: "Alarma 2",
-      sonido: true,
-      notificacion: true,
-      envio_noti: "1",
-      contactos: ["1", "2", "3"],
-      simulador: "1",
-      ubicaciones: ["1", "2", "3", "4"],
-      tipo: ["1", "2"],
-    },
-    {
-      id: "3",
-      nombre: "Alarma 3",
-      sonido: true,
-      notificacion: true,
-      envio_noti: "1",
-      contactos: ["1", "2", "3"],
-      simulador: "1",
-      ubicaciones: ["1", "2", "3", "4"],
-      tipo: ["1", "2"],
-    },
-    {
-      id: "4",
-      nombre: "Alarma 4",
-      sonido: true,
-      notificacion: true,
-      envio_noti: "1",
-      contactos: ["1", "2", "3"],
-      simulador: "1",
-      ubicaciones: ["1", "2", "3", "4"],
-      tipo: ["1", "2"],
-    },
-    {
-      id: "5",
-      nombre: "Alarma 5",
-      sonido: true,
-      notificacion: true,
-      envio_noti: "1",
-      contactos: ["1", "2", "3"],
-      simulador: "1",
-      ubicaciones: ["1", "2", "3", "4"],
-      tipo: ["1", "2"],
-    },
-  ];
-
-  const ContactosData: ContactoType[] = [
-    {
-      id: "1",
-      nombre: "Carlos",
-      apellido: "Caballero",
-      numero_Tel1: "7123456",
-      alarmas: [alarmasData[0], alarmasData[1]],
-    },
-    {
-      id: "2",
-      nombre: "Jose Manuel",
-      apellido: "Carbajal",
-      numero_Tel1: "7123456",
-      numero_Tel2: "6987451",
-      alarmas: [alarmasData[1]],
-    },
-    {
-      id: "1",
-      nombre: "Jorge Luis",
-      apellido: "Gonzalez",
-      numero_Tel1: "7123456",
-      alarmas: [alarmasData[3], alarmasData[4]],
-    },
-    {
-      id: "1",
-      nombre: "Elba",
-      apellido: "Lazo",
-      numero_Tel1: "7123456",
-      numero_Tel2: "7987654",
-      alarmas: [],
-    },
-  ];
 
   const agregarContactoModal = () => {
     setContacto(undefined);
@@ -168,6 +69,26 @@ export const Contactos_conf = () => {
     //  setSistemaEdicion(undefined)
   };
 
+  /**********************************************************************************/
+  const peticionContactos = async () => {
+    console.log("Obteniendo datos");
+    console.log(Constantes.baseUrl);
+    const data = await axios.get(`${Constantes.baseUrl}/contactos`);
+    setContactosData(data.data[0]);
+  };
+  const eliminarContactoPeticion = async () => {
+    //setLoading(true);
+    await axios
+      .patch(`${Constantes.baseUrl}/contactos/${contacto?.id}/inactivar`)
+      .then((res) => {
+        Alerta({ mensaje: `completado con exito`, variant: "success" });
+      })
+      .catch((err) => {
+        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      });
+  };
+  /**********************************************************************************/
+
   const obtenerContactosPeticion = async () => {
     console.log("obteniendo sistema");
   };
@@ -181,44 +102,49 @@ export const Contactos_conf = () => {
     { campo: "acciones", nombre: "Acciones" },
   ];
 
-  const contenidoTabla: Array<Array<ReactNode>> = ContactosData.map(
-    (ContactoData, indexContacto) => [
+  const contenidoTabla: Array<Array<ReactNode>> = contactosData.map(
+    (contactoData, indexContacto) => [
       <Typography
-        key={`${ContactoData.id}-${indexContacto}-id_contacto`}
+        key={`${contactoData.id}-${indexContacto}-id_contacto`}
         variant={"body2"}
-      >{`${ContactoData.id}`}</Typography>,
+      >{`${contactoData.id}`}</Typography>,
       <Typography
-        key={`${ContactoData.nombre}-${indexContacto}-nombre`}
+        key={`${contactoData.nombre}-${indexContacto}-nombre`}
         variant={"body2"}
-      >{`${ContactoData.nombre}`}</Typography>,
+      >{`${contactoData.nombre}`}</Typography>,
       <Typography
-        key={`${ContactoData.id}-${indexContacto}- apellido`}
+        key={`${contactoData.id}-${indexContacto}- apellido`}
         variant={"body2"}
       >
-        {`${ContactoData.apellido}`}
+        {`${contactoData.apellido}`}
       </Typography>,
       <>
         <Stack direction="column" spacing={1}>
           <Chip
-            label={ContactoData.numero_Tel1}
-            key={`${ContactoData.id}-${indexContacto}- numero1`}
+            label={contactoData.numeroTel1}
+            key={`${contactoData.id}-${indexContacto}- numero1`}
           />
-          {ContactoData.numero_Tel2 && (
+          {contactoData.numeroTel2 && (
             <Chip
-              label={ContactoData.numero_Tel2}
-              key={`${ContactoData.id}-${indexContacto}- numero2`}
+              label={contactoData.numeroTel2}
+              key={`${contactoData.id}-${indexContacto}- numero2`}
             />
           )}
         </Stack>
       </>,
       <Grid>
         <Stack direction="column" spacing={1}>
-          {ContactoData.alarmas.map((alarma) => (
-            <Chip label={alarma.nombre} key={alarma.id} />
+          {contactoData.alarmaContactos.map((alarma) => (
+            <Chip label={alarma.alarma.nombre} key={alarma.id} />
           ))}
         </Stack>
       </Grid>,
-      <Grid key={`${ContactoData.id}-${indexContacto}-accion`}>
+      <Grid
+        key={`${contactoData.id}-${indexContacto}-accion`}
+        flexDirection={"column"}
+        alignContent={"center"}
+        alignItems={"center"}
+      >
         {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
         <Grid>
           <Button
@@ -228,10 +154,24 @@ export const Contactos_conf = () => {
             size={"small"}
             //color="error"
             onClick={() => {
-              editarContactoModal(ContactoData);
+              editarContactoModal(contactoData);
             }}
           >
             <Edit />
+          </Button>
+        </Grid>
+        <Grid>
+          <Button
+            variant={"text"}
+            sx={{ ml: 1, mr: 1, textTransform: "none" }}
+            key={`accionSimuladorAlarma`}
+            size={"small"}
+            color="error"
+            onClick={async () => {
+              await eliminarContactoModal(contactoData);
+            }}
+          >
+            <Delete />
           </Button>
         </Grid>
         {/* )} */}
@@ -239,6 +179,34 @@ export const Contactos_conf = () => {
     ]
   );
 
+  const eliminarContactoModal = async (contactoData: ContactoType) => {
+    setContacto(contactoData); // para mostrar datos de articulo en la alerta
+    setMostrarAlertaEliminarContacto(true); // para mostrar alerta de articulos
+  };
+  const aceptarAlertaEliminarContacto = async () => {
+    setMostrarAlertaEliminarContacto(false);
+    if (contacto) {
+      await eliminarContactoPeticion();
+    }
+    setContacto(null);
+  };
+  /// Método que cierra alerta de cambio de estado
+
+  const cancelarAlertaEliminarContacto = async () => {
+    setMostrarAlertaEliminarContacto(false);
+    //await delay(500) // para no mostrar undefined mientras el modal se cierra
+    setContacto(null);
+  };
+
+  useEffect(() => {
+    peticionContactos();
+  }, []);
+  const refrescar = async () => {
+    peticionContactos();
+  };
+  useEffect(() => {
+    peticionContactos();
+  }, [contacto]);
   return (
     <>
       <Dialog
@@ -249,14 +217,21 @@ export const Contactos_conf = () => {
       >
         <ModalContacto
           contacto={contacto}
-          alarmas={alarmasData}
           accionCancelar={cerrarContactoModal}
           accionCorrecta={() => {
             cerrarContactoModal().finally();
-            //obtenerAlarmasPeticion();
+            refrescar().finally();
           }}
         />
       </Dialog>
+      <AlertDialog
+        isOpen={mostrarAlertaEliminarContacto}
+        titulo={"Alerta"}
+        texto={`¿Está seguro de Eliminar el contacto  ${contacto?.nombre + ' ' + contacto?.apellido} ?`}
+      >
+        <Button onClick={cancelarAlertaEliminarContacto}>Cancelar</Button>
+        <Button onClick={aceptarAlertaEliminarContacto}>Aceptar</Button>
+      </AlertDialog>
       <Grid container justifyContent={"center"}>
         <Grid item xs={12} sm={12} md={10} lg={10} xl={10} marginTop={"3%"}>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>

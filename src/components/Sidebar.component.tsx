@@ -19,6 +19,7 @@ import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import { Children, FC, PropsWithChildren, useState, useContext } from "react";
+import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
 
 import { userContext } from "../App";
 import { NavLink, Outlet } from "react-router-dom";
@@ -136,7 +137,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
                     <AddModeratorIcon />
                     <Box width={"20px"} />
                     <Typography variant={"body1"}>
-                      Activar / Desactivar
+                      Alarmas
                     </Typography>
                   </Box>
                 </ListItemButton>
@@ -314,6 +315,33 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
                     <SettingsInputComponentIcon />
                     <Box width={"20px"} />
                     <Typography variant={"body1"}>Dispositivos</Typography>
+                  </Box>
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={NavLink}
+                  to="/config_ubicaciones"
+                  sx={{
+                    "&.active": {
+                      backgroundColor: "#E5E5E5",
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      p: "1 2 3 4",
+                      m: 0,
+                      borderRadius: 1,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box width={"20px"} />
+                    <EditLocationAltIcon />
+                    <Box width={"20px"} />
+                    <Typography variant={"body1"}>Ubicaciones</Typography>
                   </Box>
                 </ListItemButton>
               </ListItem>
