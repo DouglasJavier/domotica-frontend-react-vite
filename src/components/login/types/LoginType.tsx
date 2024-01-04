@@ -6,3 +6,8 @@ export interface UsuarioType {
   contrasenia: string;
   rol: string;
 }
+
+export interface LoginType {
+  usuario: string;
+  contrasena: string;
+}

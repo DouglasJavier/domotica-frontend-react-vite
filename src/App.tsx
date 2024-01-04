@@ -16,6 +16,7 @@ import { useTheme } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
 import { SnackbarProvider } from "notistack";
 import { Ubicaciones_conf } from "./pages/Ubicaciones";
+import { Login } from "./pages/Login";
 
 interface MenuSide {
   sideMenuOpen: boolean;
@@ -46,8 +47,9 @@ function App() {
       >
         <SnackbarProvider maxSnack={1}>
           <Routes>
+            <Route path="/" element={<Login />} />
             <Route
-              path="/"
+              path="/admin"
               element={
                 <>
                   <Navbar cambiarEstado={cambiarEstado} />
@@ -55,26 +57,40 @@ function App() {
                 </>
               }
             >
-              <Route path="/" element={<Camaras />} />
+              <Route path="/admin" element={<Camaras />} />
+
               <Route
                 path="activar_desactivar"
                 element={<Activar_desactivar />}
               />
               <Route path="incidentes" element={<Incidentes_historial />} />
               <Route
-                path="/historial_activ_desact"
+                path="/admin/historial_activ_desact"
                 element={<Activ_desac_historial />}
               />
               <Route
-                path="/simulacion_presencia"
+                path="/admin/simulacion_presencia"
                 element={<Simulacion_presencia_conf />}
               />
-              <Route path="config_contactos" element={<Contactos_conf />} />
-              <Route path="config_disp" element={<Dispositivos_conf />} />
-              <Route path="config_usuarios" element={<Usuarios_conf />} />
-              <Route path="config_ubicaciones" element={<Ubicaciones_conf />} />
+              <Route
+                path="/admin/config_contactos"
+                element={<Contactos_conf />}
+              />
+              <Route
+                path="/admin/config_disp"
+                element={<Dispositivos_conf />}
+              />
+              <Route
+                path="/admin/config_usuarios"
+                element={<Usuarios_conf />}
+              />
+              <Route
+                path="/admin/config_ubicaciones"
+                element={<Ubicaciones_conf />}
+              />
               <Route path="*" element={<Default />} />
             </Route>
+            <Route path="*" element={<Default />} />
           </Routes>
         </SnackbarProvider>
         {/* <Navbar cambiarEstado={cambiarEstado} />
