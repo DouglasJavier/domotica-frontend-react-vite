@@ -35,7 +35,8 @@ import { Delete, Key } from "@mui/icons-material";
 import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { Constantes } from '../../config'
+import { Constantes } from "../../config";
+import { useSession } from "../../common/hooks/useSession";
 
 interface ColumnaType {
   campo: string;
@@ -46,6 +47,8 @@ export const Activar_desactivar = () => {
   /* console.log("*************************************************");
   console.log(Constantes.baseUrl);
   console.log("*************************************************"); */
+  const { sesionPeticion } = useSession();
+
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [alarma, setAlarma] = useState<AlarmaType | null>();
   const [alarmasData, setAlarmasData] = useState<AlarmaType[]>([]);
@@ -67,68 +70,159 @@ export const Activar_desactivar = () => {
 
   /**********************************************************************************/
   const peticionAlarmas = async () => {
-    console.log("Obteniendo datos");
+    /* console.log("Obteniendo datos");
     const data = await axios.get(`${Constantes.baseUrl}/alarmas`);
-    setAlarmasData(data.data[0]);
+    setAlarmasData(data.data[0]); */
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/alarmas`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+        },
+      });
+      setAlarmasData(respuesta[0]);
+      setTotal(respuesta.datos?.total);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   const peticionContactos = async () => {
-    const data = await axios.get(
+    /* const data = await axios.get(
       `${Constantes.baseUrl}/contactos`
     );
-    setContactosData(data.data[0]);
+    setContactosData(data.data[0]); */
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/contactos`,
+      });
+      setContactosData(respuesta[0]);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   const peticionUbicaciones = async () => {
-    const data = await axios.get(
-      `${Constantes.baseUrl}/ubicaciones`
-    );
-    setUbicacionesData(data.data[0]);
+    /* const data = await axios.get(`${Constantes.baseUrl}/ubicaciones`);
+    setUbicacionesData(data.data[0]); */
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/ubicaciones`,
+      });
+      setUbicacionesData(respuesta[0]);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   const peticionSimuladores = async () => {
-    const data = await axios.get(
-      `${Constantes.baseUrl}/simuladores`
-    );
-    setSimuladoresData(data.data[0]);
+    /* const data = await axios.get(`${Constantes.baseUrl}/simuladores`);
+    setSimuladoresData(data.data[0]); */
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/simuladores`,
+      });
+      setSimuladoresData(respuesta[0]);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   const cambiarEstadoAlarmaPeticion = async (alarmaData: AlarmaType) => {
     //setLoading(true);
     if (alarma?.estado !== "ENCENDIDO") {
-      await axios
-        .patch(
-          `${Constantes.baseUrl}/alarmas/${alarma?.id}/encender`
-        )
+      /* await axios
+        .patch(`${Constantes.baseUrl}/alarmas/${alarma?.id}/encender`)
         .then((res) => {
           Alerta({ mensaje: `completado con exito`, variant: "success" });
           console.log("encendido");
         })
         .catch((err) => {
           Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+        }); */
+      try {
+        setLoading(true);
+
+        const respuesta = await sesionPeticion({
+          url: `${Constantes.baseUrl}alarmas/${alarma?.id}/encender`,
         });
+
+        Alerta({
+          mensaje: `${InterpreteMensajes(respuesta)}`,
+          variant: "success",
+        });
+      } catch (e) {
+        Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+      } finally {
+        setLoading(false);
+      }
     } else {
-      await axios
-        .patch(
-          `${Constantes.baseUrl}/alarmas/${alarma?.id}/apagar`
-        )
+      /*  await axios
+        .patch(`${Constantes.baseUrl}/alarmas/${alarma?.id}/apagar`)
         .then((res) => {
-          Alerta({ mensaje: `completado con exito`, variant: "success" });
+          Alerta({ mensaje: `Apagado con exito`, variant: "success" });
           console.log("");
         })
         .catch((err) => {
           Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+        }); */
+      try {
+        setLoading(true);
+
+        const respuesta = await sesionPeticion({
+          url: `${Constantes.baseUrl}alarmas/${alarma?.id}/apagar`,
         });
+
+        Alerta({
+          mensaje: `${InterpreteMensajes(respuesta)}`,
+          variant: "success",
+        });
+      } catch (e) {
+        Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+      } finally {
+        setLoading(false);
+      }
     }
   };
   const eliminarAlarmaPeticion = async (alarmaData: AlarmaType) => {
     //setLoading(true);
-    await axios
-      .patch(
-        `${Constantes.baseUrl}/alarmas/${alarma?.id}/eliminar`
-      )
+    /* await axios
+      .patch(`${Constantes.baseUrl}/alarmas/${alarma?.id}/eliminar`)
       .then((res) => {
         Alerta({ mensaje: `completado con exito`, variant: "success" });
       })
       .catch((err) => {
         Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
+      }); */
+      try {
+        setLoading(true);
+
+        const respuesta = await sesionPeticion({
+          url: `${Constantes.baseUrl}alarmas/${alarma?.id}/eliminar`,
+        });
+
+        Alerta({
+          mensaje: `${InterpreteMensajes(respuesta)}`,
+          variant: "success",
+        });
+      } catch (e) {
+        Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+      } finally {
+        setLoading(false);
+      }
   };
   /**********************************************************************************/
   const acciones: Array<ReactNode> = [

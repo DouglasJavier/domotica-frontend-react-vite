@@ -89,7 +89,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}
-                  to="/"
+                  to="/admin/"
                   sx={{
                     "&.active": {
                       backgroundColor: "#E5E5E5",
@@ -116,7 +116,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}
-                  to="/activar_desactivar"
+                  to="/admin/activar_desactivar"
                   sx={{
                     "&.active": {
                       backgroundColor: "#E5E5E5",
@@ -161,7 +161,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}
-                  to="/incidentes"
+                  to="/admin/incidentes"
                   sx={{
                     "&.active": {
                       backgroundColor: "#E5E5E5",
@@ -190,7 +190,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}
-                  to="/historial_activ_desact"
+                  to="/admin/historial_activ_desact"
                   sx={{
                     "&.active": {
                       backgroundColor: "#E5E5E5",
@@ -235,7 +235,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}
-                  to="/simulacion_presencia"
+                  to="/admin/simulacion_presencia"
                   sx={{
                     "&.active": {
                       backgroundColor: "#E5E5E5",
@@ -264,7 +264,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}
-                  to="/config_contactos"
+                  to="/admin/config_contactos"
                   sx={{
                     "&.active": {
                       backgroundColor: "#E5E5E5",
@@ -293,7 +293,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}
-                  to="/config_disp"
+                  to="/admin/config_disp"
                   sx={{
                     "&.active": {
                       backgroundColor: "#E5E5E5",
@@ -321,7 +321,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}
-                  to="/config_ubicaciones"
+                  to="/admin/config_ubicaciones"
                   sx={{
                     "&.active": {
                       backgroundColor: "#E5E5E5",
@@ -348,7 +348,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
               <ListItem disablePadding>
                 <ListItemButton
                   component={NavLink}
-                  to="/config_usuarios"
+                  to="/admin/config_usuarios"
                   sx={{
                     "&.active": {
                       backgroundColor: "#E5E5E5",

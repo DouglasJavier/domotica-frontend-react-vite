@@ -17,6 +17,7 @@ import { useMediaQuery } from "@mui/material";
 import { SnackbarProvider } from "notistack";
 import { Ubicaciones_conf } from "./pages/Ubicaciones";
 import { Login } from "./pages/Login";
+import { AuthProvider } from "../common/context/auth";
 
 interface MenuSide {
   sideMenuOpen: boolean;
@@ -45,56 +46,60 @@ function App() {
           sideMenuOpen: openMenuSide,
         }}
       >
-        <SnackbarProvider maxSnack={1}>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route
-              path="/admin"
-              element={
-                <>
-                  <Navbar cambiarEstado={cambiarEstado} />
-                  <Sidebar />
-                </>
-              }
-            >
-              <Route path="/admin" element={<Camaras />} />
+        <SnackbarProvider maxSnack={2}>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route
+                path="/admin"
+                element={
+                  <>
+                    <Navbar cambiarEstado={cambiarEstado} />
+                    <Sidebar />
+                  </>
+                }
+              >
+                <Route path="/admin" element={<Camaras />} />
 
-              <Route
-                path="activar_desactivar"
-                element={<Activar_desactivar />}
-              />
-              <Route path="incidentes" element={<Incidentes_historial />} />
-              <Route
-                path="/admin/historial_activ_desact"
-                element={<Activ_desac_historial />}
-              />
-              <Route
-                path="/admin/simulacion_presencia"
-                element={<Simulacion_presencia_conf />}
-              />
-              <Route
-                path="/admin/config_contactos"
-                element={<Contactos_conf />}
-              />
-              <Route
-                path="/admin/config_disp"
-                element={<Dispositivos_conf />}
-              />
-              <Route
-                path="/admin/config_usuarios"
-                element={<Usuarios_conf />}
-              />
-              <Route
-                path="/admin/config_ubicaciones"
-                element={<Ubicaciones_conf />}
-              />
+                <Route
+                  path="/admin/activar_desactivar"
+                  element={<Activar_desactivar />}
+                />
+                <Route
+                  path="/admin/incidentes"
+                  element={<Incidentes_historial />}
+                />
+                <Route
+                  path="/admin/historial_activ_desact"
+                  element={<Activ_desac_historial />}
+                />
+                <Route
+                  path="/admin/simulacion_presencia"
+                  element={<Simulacion_presencia_conf />}
+                />
+                <Route
+                  path="/admin/config_contactos"
+                  element={<Contactos_conf />}
+                />
+                <Route
+                  path="/admin/config_disp"
+                  element={<Dispositivos_conf />}
+                />
+                <Route
+                  path="/admin/config_usuarios"
+                  element={<Usuarios_conf />}
+                />
+                <Route
+                  path="/admin/config_ubicaciones"
+                  element={<Ubicaciones_conf />}
+                />
+              </Route>
               <Route path="*" element={<Default />} />
-            </Route>
-            <Route path="*" element={<Default />} />
-          </Routes>
-        </SnackbarProvider>
-        {/* <Navbar cambiarEstado={cambiarEstado} />
+            </Routes>
+            {/* <Navbar cambiarEstado={cambiarEstado} />
           <Sidebar/> */}
+          </AuthProvider>
+        </SnackbarProvider>
       </userContext.Provider>
     </>
   );

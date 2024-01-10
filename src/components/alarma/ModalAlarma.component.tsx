@@ -25,6 +25,7 @@ import axios from "axios";
 import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import { Constantes } from '../../../config'
+import { useSession } from "../../../common/hooks/useSession";
 
 interface ModalAlarmaProps {
   alarma?: AlarmaType | null;
@@ -43,6 +44,7 @@ export const ModalAlarma = ({
   accionCorrecta,
 }: ModalAlarmaProps) => {
   const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
 
   const [sim, setSim] = useState<number>(0);
   const { handleSubmit, control, watch, setValue, getValues } =
@@ -70,35 +72,25 @@ export const ModalAlarma = ({
   const handleChange = (event: SelectChangeEvent) => {
     setSim(parseInt(event.target.value) as number);
   };
-  const postAlarma = async (elem: AlarmaCRUDType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .post(`${Constantes.baseUrl}/alarmas`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `${InterpreteMensajes(res)}`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
-  };
-  const patchAlarma = async (elem: AlarmaCRUDType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .patch(`${Constantes.baseUrl}/alarmas/${alarma?.id}`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `${InterpreteMensajes(res)}`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
-  };
+  
   const guardarActualizarAlarma = async (data: AlarmaCRUDType) => {
-    if (alarma) {
-      await patchAlarma(data);
-      accionCorrecta();
-    } else {
-      await postAlarma(data);
-      accionCorrecta();
+    
+    try {
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/alarmas${
+          alarma?.id ? `/${alarma.id}` : ''
+        }`,
+        tipo: alarma?.id ? 'patch' : 'post',
+        body: data,
+      })
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: 'success',
+      })
+      accionCorrecta()
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
     }
   };
   return (

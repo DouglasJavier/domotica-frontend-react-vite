@@ -1,7 +1,7 @@
 import { AccountCircle, MenuOpenOutlined } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import {Sidebar} from './Sidebar.component'
+import { Sidebar } from "./Sidebar.component";
 import {
   AppBar,
   Toolbar,
@@ -16,18 +16,26 @@ import {
   FormGroup,
   Switch,
   Grid,
+  Button,
 } from "@mui/material";
 import { useState, useContext } from "react";
 import React from "react";
-import { userContext } from '../App' 
+import { userContext } from "../App";
+import { useSession } from "../../common/hooks/useSession";
+import { InterpreteMensajes } from "../../common/utils";
+import { Constantes } from "../../config";
+import { useAlerts } from "../../common/hooks/useAlerts";
 
 interface NavbarProps {
-    cambiarEstado: () => void 
+  cambiarEstado: () => void;
 }
 
-export const Navbar = ({cambiarEstado}:NavbarProps) => {
- // const [sideMenuOpen, setSideMenuOpen] = useState<boolean>(true);
-  const sideMenuOpen = useContext(userContext).sideMenuOpen
+export const Navbar = ({ cambiarEstado }: NavbarProps) => {
+  // const [sideMenuOpen, setSideMenuOpen] = useState<boolean>(true);
+  const { sesionPeticion, cerrarSesion } = useSession();
+  const { Alerta } = useAlerts();
+
+  const sideMenuOpen = useContext(userContext).sideMenuOpen;
   const [auth, setAuth] = React.useState(true);
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.only("xs"));
@@ -52,8 +60,9 @@ export const Navbar = ({cambiarEstado}:NavbarProps) => {
   const cerrarSide = () => {
     cambiarEstado();
   };
+  
 
- /*  const abrirSide = () => {
+  /*  const abrirSide = () => {
     setSideMenuOpen(true);
   };
 
@@ -126,13 +135,13 @@ export const Navbar = ({cambiarEstado}:NavbarProps) => {
                 onClose={handleClose}
               >
                 <MenuItem onClick={handleClose}>Cambiar Datos</MenuItem>
-                <MenuItem onClick={handleClose}>Salir</MenuItem>
+                <MenuItem><Button onClick={cerrarSesion}>Salir</Button></MenuItem>
               </Menu>
             </Grid>
           </Grid>
         </Toolbar>
       </AppBar>
-  {/*  <Sidebar sideMenuOpen={sideMenuOpen}/> */}
+      {/*  <Sidebar sideMenuOpen={sideMenuOpen}/> */}
     </>
   );
 };

@@ -7,7 +7,12 @@ export const delay = (ms: number) => {
 }
 
 export const encodeBase64 = (data: string) => {
-  return Buffer.from(data).toString('base64')
+  console.log('contraseña');
+  console.log(data);
+  const a = Buffer.from(data).toString('base64')
+  console.log(a);
+  console.log('.............');
+  return a
 }
 export const decodeBase64 = (data: string) => {
   return Buffer.from(data, 'base64').toString('ascii')

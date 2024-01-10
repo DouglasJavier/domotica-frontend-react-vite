@@ -11,7 +11,8 @@ import axios from "axios";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { useAlerts } from "../../common/hooks";
 import { AlertDialog } from "../../common/components/ui";
-import { Constantes } from '../../config'
+import { Constantes } from "../../config";
+import { useSession } from "../../common/hooks/useSession";
 
 export const Usuarios_conf = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -28,6 +29,7 @@ export const Usuarios_conf = () => {
   const [limite, setLimite] = useState<number>(10);
   const [pagina, setPagina] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
+  const { sesionPeticion } = useSession();
   const acciones: Array<ReactNode> = [
     <Button
       variant={"contained"}
@@ -70,9 +72,26 @@ export const Usuarios_conf = () => {
 
   /**********************************************************************************/
   const peticionUsuarios = async () => {
-    console.log("Obteniendo datos");
-    const data = await axios.get(`${Constantes.baseUrl}/usuarios`);
-    setUsuariosData(data.data[0]);
+  
+    /* const data = await axios.get(`${Constantes.baseUrl}/usuarios`);
+    setUsuariosData(data.data[0]); */
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/usuarios`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+        },
+      });
+      setUsuariosData(respuesta[0]);
+      setTotal(respuesta.datos?.total);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const eliminarUsuarioPeticion = async () => {

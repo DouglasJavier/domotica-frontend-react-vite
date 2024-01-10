@@ -13,6 +13,7 @@ import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { AlertDialog } from "../../common/components/ui";
 import { ModalActivarDesactivar } from "../components/historial-activacion/ModalActivarDesactivar";
 import { Constantes } from '../../config'
+import { useSession } from "../../common/hooks/useSession";
 
 //import { ModalalarmaFotos } from "../components/historial-activacion/RowalarmaActivacion.component";
 
@@ -24,6 +25,7 @@ interface alarmaType {
   accion: string;
 }
 export const Activ_desac_historial = () => {
+  const { sesionPeticion } = useSession();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [alarma, setalarma] = useState<alarmaType | null>();
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
@@ -67,11 +69,28 @@ export const Activ_desac_historial = () => {
 
   /**************************************************************************/
   const peticionHistorialActivarDesactivar = async () => {
-    console.log("Obteniendo datos");
+    /* console.log("Obteniendo datos");
     const data = await axios.get(
       `${Constantes.baseUrl}/historialActivarDesactivar`
     );
-    setHistorialActivarDesactivarData(data.data[0]);
+    setHistorialActivarDesactivarData(data.data[0]); */
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/historialActivarDesactivar`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+        },
+      });
+      setHistorialActivarDesactivar(respuesta[0]);
+      setTotal(respuesta.datos?.total);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   const eliminarHistorialIncidentePeticion = async (
     historialData: HistorialActivarDesactivarType

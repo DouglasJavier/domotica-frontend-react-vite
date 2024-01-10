@@ -11,7 +11,6 @@ export const useAlerts = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
 
   const Alerta = ({ mensaje, variant = 'info' }: AlertType) => {
-    console.log('entro aqui')
     enqueueSnackbar(mensaje, {
       variant,
       anchorOrigin: {

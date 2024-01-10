@@ -18,6 +18,7 @@ import axios from "axios";
 import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import { Constantes } from '../../../config'
+import { useSession } from "../../../common/hooks/useSession";
 interface ModalContactoProps {
   contacto?: ContactoType | null;
   accionCancelar: () => void;
@@ -30,6 +31,7 @@ export const ModalContacto = ({
   accionCorrecta,
 }: ModalContactoProps) => {
   const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
 
   const { handleSubmit, control, watch, setValue, getValues } =
     useForm<ContactoCRUDType>({
@@ -46,35 +48,24 @@ export const ModalContacto = ({
   const [defaultActuadorData, setDefaultActuadorData] =
     useState<optionType>(defaultOption);
   const guardarActualizarContacto = async (data: ContactoCRUDType) => {
-    if (contacto) {
-      await patchContactoPeticion(data);
-      accionCorrecta();
-    } else {
-      await postContactoPeticion(data);
-      accionCorrecta();
+     
+    try {
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/alarmas${
+          contacto?.id ? `/${contacto.id}` : ''
+        }`,
+        tipo: contacto?.id ? 'patch' : 'post',
+        body: data,
+      })
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: 'success',
+      })
+      accionCorrecta()
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
     }
-  };
-  const postContactoPeticion = async (elem: ContactoCRUDType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .post(`${Constantes.baseUrl}/contactos`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
-  };
-  const patchContactoPeticion = async (elem: ContactoCRUDType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .patch(`${Constantes.baseUrl}/contactos/${contacto?.id}`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
   };
   return (
     <form onSubmit={handleSubmit(guardarActualizarContacto)}>

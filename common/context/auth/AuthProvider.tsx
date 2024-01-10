@@ -21,6 +21,7 @@ import {
   UsuarioType,
 } from "../../../src/components/login/types/LoginType";
 import { useAlerts } from "../../hooks";
+import { useNavigate } from "react-router-dom";
 
 interface ContextProps {
   cargarUsuarioManual: () => Promise<void>;
@@ -44,6 +45,7 @@ export const AuthProvider = ({ children }: AuthContextType) => {
   const { Alerta } = useAlerts();
 
   /* const router = useRouter(); */
+  const navigate = useNavigate();
 
   const { sesionPeticion, borrarCookiesSesion } = useSession();
 
@@ -75,7 +77,6 @@ export const AuthProvider = ({ children }: AuthContextType) => {
 
   const cargarUsuarioManual = async () => {
     try {
-
       await delay(1000);
 
       /* await router.replace({
@@ -110,29 +111,35 @@ export const AuthProvider = ({ children }: AuthContextType) => {
 
   const login = async ({ usuario, contrasena }: LoginType) => {
     try {
-      setLoading(true);
-
-      await delay(1000);
+      console.log("entro login");
+      console.log(usuario);
+      console.log(contrasena);
+      console.log(Constantes.baseUrl);
       const respuesta = await Servicios.post({
         url: `${Constantes.baseUrl}/auth`,
-        body: { usuario, contrasena: encodeBase64(encodeURI(contrasena)) },
+        body: { usuario, contrasena },
         headers: {},
       });
+      /* await axios
+        .post(`${Constantes.baseUrl}/auth`, {
+          usuario,
+          contrasena: encodeBase64(encodeURI(contrasena)),
+        })
+        .then((res) => {
+          Alerta({ mensaje: `${InterpreteMensajes(res)}`, variant: "success" });
+        })
+        .catch((err) => {
+          Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+        }); */
 
-      guardarCookie("token", respuesta.datos?.access_token);
+      guardarCookie("token", respuesta.access_token);
 
       setUser(respuesta.datos);
-
-
-      await delay(1000);
-      /* await router.replace({
-        pathname: "/admin/home",
-      }); */
+      navigate("/admin", { replace: true });
     } catch (e) {
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
       borrarSesionUsuario();
     } finally {
-      setLoading(false);
     }
   };
 

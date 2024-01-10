@@ -4,10 +4,11 @@ import Typography from "@mui/material/Typography";
 import { Constantes } from "../../../config";
 /* import { useAuth } from '../../../context/auth' */
 import { useForm } from "react-hook-form";
+import { useAuth } from "../../../common/context/auth";
 /* import { LoginType } from '../types/loginTypes' */
 
 const LoginNormalContainer = () => {
-  /*   const { ingresar, progresoLogin } = useAuth() */
+  const { ingresar, progresoLogin } = useAuth();
 
   const { handleSubmit, control } = useForm<any>({
     defaultValues: {
@@ -17,7 +18,10 @@ const LoginNormalContainer = () => {
   });
 
   const iniciarSesion = async ({ usuario, contrasena }: any) => {
-    /* await ingresar({ usuario, contrasena }) */
+    console.log("entro");
+    /* console.log(usuario);
+    console.log(contrasena); */
+    await ingresar({ usuario, contrasena });
   };
 
   return (

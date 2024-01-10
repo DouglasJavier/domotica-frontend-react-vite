@@ -6,6 +6,7 @@ import {
 } from "../services";
 import { verificarToken } from "../utils/token";
 import { Constantes } from "../../config";
+import { Token } from "@mui/icons-material";
 /* import { useRouter } from 'next/router' */
 
 export const useSession = () => {
@@ -21,16 +22,19 @@ export const useSession = () => {
     withCredentials,
   }: peticionFormatoMetodo) => {
     try {
+      console.log("token:   ");
       if (!verificarToken(leerCookie("token") ?? "")) {
-        await actualizarSesion();
+        console.log("entro a cerrar");
+        await cerrarSesion();
+        //await actualizarSesion();
       }
-
+      console.log("no entro a cerrar");
       const cabeceras = {
         accept: "application/json",
         Authorization: `Bearer ${leerCookie("token") ?? ""}`,
         ...headers,
       };
-
+      console.log("cabecera", cabeceras);
       const response = await Servicios.peticionHTTP({
         url,
         tipo,
@@ -61,32 +65,23 @@ export const useSession = () => {
 
   const borrarCookiesSesion = () => {
     eliminarCookie("token"); // Eliminando access_token
-    eliminarCookie("jid"); // Eliminando refresh token
+    //eliminarCookie("jid"); // Eliminando refresh token
   };
 
   const cerrarSesion = async () => {
-    try {
-      await delay(1000);
-      const token = leerCookie("token");
-      borrarCookiesSesion();
+    await delay(1000);
+    //const token = leerCookie("token");
+    borrarCookiesSesion();
 
-      const respuesta = await Servicios.get({
+    /* const respuesta = await Servicios.get({
         headers: {
           accept: "application/json",
           Authorization: `Bearer ${token}`,
         },
         url: `${Constantes.baseUrl}/logout`,
-      });
+      }); */
 
-      if (respuesta?.url) {
-        window.location.href = respuesta?.url;
-      } else {
-        //router.reload()
-      }
-    } catch (e) {
-      //router.reload()
-    } finally {
-    }
+    window.location.href = "/";
   };
 
   const actualizarSesion = async () => {
