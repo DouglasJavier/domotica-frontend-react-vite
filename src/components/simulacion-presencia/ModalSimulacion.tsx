@@ -34,6 +34,7 @@ import { useAlerts } from "../../../common/hooks";
 import axios from "axios";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import { Constantes } from '../../../config'
+import { useSession } from "../../../common/hooks/useSession";
 /* interface horario {
   horaInicio: Date;
   horaFin: Date;
@@ -85,6 +86,7 @@ export const ModalSimulador = ({
   accionCorrecta,
 }: ModalSimulacionProps) => {
   const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
 
   const { handleSubmit, control, watch, setValue, getValues } =
     useForm<SimuladorCRUDType>({
@@ -196,37 +198,25 @@ export const ModalSimulador = ({
     });
   };
   const guardarActualizarSimulador = async (data: SimuladorCRUDType) => {
-    if (simulacion) {
-      await patchSimuladorPeticion(data);
+    try {
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/simuladores${
+          simulacion?.id ? `/${simulacion.id}` : ""
+        }`,
+        tipo: simulacion?.id ? "patch" : "post",
+        body: data,
+      });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
       accionCorrecta();
-    } else {
-      await postSimuladorPeticion(data);
-      accionCorrecta();
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
     }
   };
  
-  const postSimuladorPeticion = async (elem: SimuladorCRUDType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .post(`${Constantes.baseUrl}/simuladores`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
-  };
-  const patchSimuladorPeticion = async (elem: SimuladorCRUDType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .patch(`${Constantes.baseUrl}/simuladores/${simulacion?.id}`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
-  };
 
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.only("xs"));

@@ -24,7 +24,7 @@ import {
 import axios from "axios";
 import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
-import { Constantes } from '../../../config'
+import { Constantes } from "../../../config";
 import { useSession } from "../../../common/hooks/useSession";
 
 interface ModalAlarmaProps {
@@ -51,18 +51,18 @@ export const ModalAlarma = ({
     useForm<AlarmaCRUDType>({
       defaultValues: {
         nombre: alarma?.nombre,
-        sonido: alarma?.sonido ? true : false,
-        notificacion: alarma?.notificacion ? true : false,
+        sonido: alarma?.sonido || "2",
         envio_noti: alarma?.envio_noti ? alarma?.envio_noti : "1",
         idContactos: alarma
           ? alarma.alarmaContactos.map((contactos) => contactos.contacto.id)
           : [],
-        idSimulador: alarma?.idSimulador ? alarma.idSimulador : "0",
+        idSimulador: alarma?.idSimulador ? alarma.idSimulador : "1",
         idUbicaciones: alarma
           ? alarma.ubicacionAlarmas.map((ubicacion) => ubicacion.ubicacion.id)
           : [],
         seguridadBienes: alarma?.seguridadBienes,
-        seguridadPersonas: alarma?.seguridadPersonas,
+        sensoresHumo: alarma?.sensoresHumo,
+        alumbradoAutomatico: alarma?.alumbradoAutomatico,
       },
     });
   console.log("*******************************************");
@@ -72,24 +72,23 @@ export const ModalAlarma = ({
   const handleChange = (event: SelectChangeEvent) => {
     setSim(parseInt(event.target.value) as number);
   };
-  
+
   const guardarActualizarAlarma = async (data: AlarmaCRUDType) => {
-    
     try {
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/alarmas${
-          alarma?.id ? `/${alarma.id}` : ''
+          alarma?.id ? `/${alarma.id}` : ""
         }`,
-        tipo: alarma?.id ? 'patch' : 'post',
+        tipo: alarma?.id ? "patch" : "post",
         body: data,
-      })
+      });
       Alerta({
         mensaje: InterpreteMensajes(respuesta),
-        variant: 'success',
-      })
-      accionCorrecta()
+        variant: "success",
+      });
+      accionCorrecta();
     } catch (e) {
-      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
     } finally {
     }
   };
@@ -110,31 +109,37 @@ export const ModalAlarma = ({
         <br />
         <Grid container direction={"row"}>
           <Grid item xs={12} sm={12} md={6}>
+            <br />
             <FormInputSwitch
               id={"seguridadBienes"}
               control={control}
               name="seguridadBienes"
-              label="Activar Seguridad para Bienes:"
+              label="Activar Seguridad para Bienes :"
             />
             <FormInputSwitch
-              id={"seguridadPersonas"}
+              id={"sensoresHumo"}
               control={control}
-              name="seguridadPersonas"
-              label="Activar Seguridad para personas:"
+              name="sensoresHumo"
+              label="Activar sensores de humo :"
+            />
+            <FormInputSwitch
+              id={"alumbradoAutomatico"}
+              control={control}
+              name="alumbradoAutomatico"
+              label="Activar alumbrado automático :"
             />
           </Grid>
           <Grid item xs={12} sm={12} md={6}>
-            <FormInputSwitch
+            <FormInputRadio
               id={"sonido"}
-              control={control}
               name="sonido"
-              label="Activar alerta de sonido :"
-            />
-            <FormInputSwitch
-              id={"notificacion"}
               control={control}
-              name="notificacion"
-              label="Enviar notificación a usuarios :"
+              label="Activar alaerta de sonido :"
+              options={[
+                { label: "No", value: "1" },
+                { label: "Preguntar primero", value: "2" },
+                { label: "Automaticamente", value: "3" },
+              ]}
             />
           </Grid>
         </Grid>

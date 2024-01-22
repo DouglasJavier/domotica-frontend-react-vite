@@ -70,9 +70,6 @@ export const Activar_desactivar = () => {
 
   /**********************************************************************************/
   const peticionAlarmas = async () => {
-    /* console.log("Obteniendo datos");
-    const data = await axios.get(`${Constantes.baseUrl}/alarmas`);
-    setAlarmasData(data.data[0]); */
     try {
       setLoading(true);
 
@@ -92,10 +89,6 @@ export const Activar_desactivar = () => {
     }
   };
   const peticionContactos = async () => {
-    /* const data = await axios.get(
-      `${Constantes.baseUrl}/contactos`
-    );
-    setContactosData(data.data[0]); */
     try {
       setLoading(true);
 
@@ -110,8 +103,6 @@ export const Activar_desactivar = () => {
     }
   };
   const peticionUbicaciones = async () => {
-    /* const data = await axios.get(`${Constantes.baseUrl}/ubicaciones`);
-    setUbicacionesData(data.data[0]); */
     try {
       setLoading(true);
 
@@ -126,8 +117,6 @@ export const Activar_desactivar = () => {
     }
   };
   const peticionSimuladores = async () => {
-    /* const data = await axios.get(`${Constantes.baseUrl}/simuladores`);
-    setSimuladoresData(data.data[0]); */
     try {
       setLoading(true);
 
@@ -144,46 +133,13 @@ export const Activar_desactivar = () => {
   const cambiarEstadoAlarmaPeticion = async (alarmaData: AlarmaType) => {
     //setLoading(true);
     if (alarma?.estado !== "ENCENDIDO") {
-      /* await axios
-        .patch(`${Constantes.baseUrl}/alarmas/${alarma?.id}/encender`)
-        .then((res) => {
-          Alerta({ mensaje: `completado con exito`, variant: "success" });
-          console.log("encendido");
-        })
-        .catch((err) => {
-          Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-        }); */
       try {
         setLoading(true);
 
         const respuesta = await sesionPeticion({
-          url: `${Constantes.baseUrl}alarmas/${alarma?.id}/encender`,
-        });
-
-        Alerta({
-          mensaje: `${InterpreteMensajes(respuesta)}`,
-          variant: "success",
-        });
-      } catch (e) {
-        Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      /*  await axios
-        .patch(`${Constantes.baseUrl}/alarmas/${alarma?.id}/apagar`)
-        .then((res) => {
-          Alerta({ mensaje: `Apagado con exito`, variant: "success" });
-          console.log("");
-        })
-        .catch((err) => {
-          Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-        }); */
-      try {
-        setLoading(true);
-
-        const respuesta = await sesionPeticion({
-          url: `${Constantes.baseUrl}alarmas/${alarma?.id}/apagar`,
+          url: `${Constantes.baseUrl}alarmas/${alarma?.id}/${
+            alarma?.estado !== "ENCENDIDO" ? "encender" : "apagar"
+          }`,
         });
 
         Alerta({
@@ -198,31 +154,22 @@ export const Activar_desactivar = () => {
     }
   };
   const eliminarAlarmaPeticion = async (alarmaData: AlarmaType) => {
-    //setLoading(true);
-    /* await axios
-      .patch(`${Constantes.baseUrl}/alarmas/${alarma?.id}/eliminar`)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      }); */
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
 
-        const respuesta = await sesionPeticion({
-          url: `${Constantes.baseUrl}alarmas/${alarma?.id}/eliminar`,
-        });
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}alarmas/${alarma?.id}/eliminar`,
+      });
 
-        Alerta({
-          mensaje: `${InterpreteMensajes(respuesta)}`,
-          variant: "success",
-        });
-      } catch (e) {
-        Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
-      } finally {
-        setLoading(false);
-      }
+      Alerta({
+        mensaje: `${InterpreteMensajes(respuesta)}`,
+        variant: "success",
+      });
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   /**********************************************************************************/
   const acciones: Array<ReactNode> = [
@@ -310,20 +257,26 @@ export const Activar_desactivar = () => {
         variant={"body2"}
       >{`${alarmaData.nombre}`}</Typography>,
       <>
-        {generateTypographyElement("Alerta de Sonido", alarmaData.sonido)}
-        {generateTypographyElement(
-          "Notificaciones a usuarios",
-          alarmaData.notificacion
-        )}
-
-        {generateTypographyElement(
-          "Seguridad para Personas",
-          alarmaData.seguridadPersonas
-        )}
         {generateTypographyElement(
           "Seguridad para Bienes",
           alarmaData.seguridadBienes
         )}
+        {generateTypographyElement("Sensores de humo", alarmaData.sensoresHumo)}
+        {generateTypographyElement(
+          "Alumbrado automático",
+          alarmaData.alumbradoAutomatico
+        )}
+        <Typography
+          variant="body2"
+          key={`${alarmaData.id}-${indexAlarma}- envio_notificaciones`}
+        >
+          <b>Alerta de sonido:</b>{" "}
+          {alarmaData.envio_noti === "3"
+            ? "Preguntar primero"
+            : alarmaData.envio_noti === "2"
+            ? "Automáticamente"
+            : "No"}
+        </Typography>
         <Typography
           variant="body2"
           key={`${alarmaData.id}-${indexAlarma}- envio_notificaciones`}

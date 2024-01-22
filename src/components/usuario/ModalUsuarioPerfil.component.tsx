@@ -13,13 +13,14 @@ import {
   optionType,
 } from "../../../common/components/ui/form";
 import { useState } from "react";
-import { UsuarioType } from "./types/usuarioCRUDType";
+import { CambioUsuarioType, UsuarioType } from "./types/usuarioCRUDType";
 import axios from "axios";
 import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import { AlertDialog } from "../../../common/components/ui";
 import { Constantes } from "../../../config";
 import { useSession } from "../../../common/hooks/useSession";
+import { useAuth } from "../../../common/context/auth";
 
 interface ModalSimulacionProps {
   usuario?: UsuarioType | null;
@@ -27,19 +28,22 @@ interface ModalSimulacionProps {
   accionCorrecta: () => void;
 }
 
-export const ModalUsuario = ({
-  usuario,
+export const ModalUsuarioPerfil = ({
   accionCancelar,
   accionCorrecta,
 }: ModalSimulacionProps) => {
-  const { handleSubmit, control, watch, setValue, getValues } =
-    useForm<UsuarioType>({
+  const { usuario } = useAuth();
+
+  const { handleSubmit, control, getValues, watch } =
+    useForm<CambioUsuarioType>({
       defaultValues: {
         id: usuario?.id,
         nombres: usuario?.nombres,
         apellidos: usuario?.apellidos,
         usuario: usuario?.usuario,
         rol: usuario?.rol,
+        contrasenia1: "",
+        contrasenia2: "",
       },
     });
   const { Alerta } = useAlerts();
@@ -53,11 +57,13 @@ export const ModalUsuario = ({
   const guardarActualizarUsuario = async (data: UsuarioType) => {
     try {
       const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/usuarios${
-          usuario?.id ? `/${usuario.id}` : ""
-        }`,
-        tipo: usuario?.id ? "patch" : "post",
-        body: data,
+        url: `${Constantes.baseUrl}/usuarios/editar`,
+        tipo: "patch",
+        body: {
+          usuario: watch("usuario"),
+          contrasenia1: btoa(watch("contrasenia1")),
+          contrasenia2: btoa(watch("contrasenia2")),
+        },
       });
       Alerta({
         mensaje: InterpreteMensajes(respuesta),
@@ -86,8 +92,7 @@ export const ModalUsuario = ({
               control={control}
               name="nombres"
               label="Nombre del usuario"
-              // disabled={loadingModal}
-              rules={{ required: "Este campo es requerido" }}
+              disabled
             />
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
@@ -96,12 +101,20 @@ export const ModalUsuario = ({
               control={control}
               name="apellidos"
               label="Apellidos del usuario"
-              // disabled={loadingModal}
-              rules={{ required: "Este campo es requerido" }}
+              disabled
             />
           </Grid>
         </Grid>
         <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
+          <Grid item xs={12} sm={6} md={6}>
+            <FormInputText
+              id={"rol"}
+              control={control}
+              name="rol"
+              label="Rol"
+              disabled
+            />
+          </Grid>
           <Grid item xs={12} sm={6} md={6}>
             <FormInputText
               id={"direccionLan"}
@@ -112,26 +125,44 @@ export const ModalUsuario = ({
               rules={{ required: "Este campo es requerido" }}
             />
           </Grid>
+        </Grid>
+        <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
           <Grid item xs={12} sm={6} md={6}>
-            <FormInputDropdown
-              id={"direccionWan"}
+            <FormInputText
+              id={"contrasena"}
               control={control}
-              name="rol"
-              label="Rol"
-              //directionColumn={true}
-              options={[
-                {
-                  key: "ADMINISTRADOR",
-                  value: "ADMINISTRADOR",
-                  label: "Administrador",
+              name="contrasenia1"
+              label="Contraseña Actual"
+              size={"medium"}
+              labelVariant={"subtitle1"}
+              type={"password"}
+              /*             disabled={progresoLogin} */
+              rules={{
+                required: "Este campo es requerido",
+                minLength: {
+                  value: 3,
+                  message: "Mínimo 3 caracteres",
                 },
-                {
-                  key: "USUARIO",
-                  value: "USUARIO",
-                  label: "Usuario",
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={6}>
+            <FormInputText
+              id={"contrasena"}
+              control={control}
+              name="contrasenia2"
+              label="Nueva Contraseña"
+              size={"medium"}
+              labelVariant={"subtitle1"}
+              type={"password"}
+              /*             disabled={progresoLogin} */
+              rules={{
+                required: "Este campo es requerido",
+                minLength: {
+                  value: 3,
+                  message: "Mínimo 3 caracteres",
                 },
-              ]}
-              // disabled={loadingModal}
+              }}
             />
           </Grid>
         </Grid>

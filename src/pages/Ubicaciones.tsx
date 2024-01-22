@@ -11,9 +11,13 @@ import axios from "axios";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { useAlerts } from "../../common/hooks";
 import { AlertDialog } from "../../common/components/ui";
-import { Constantes } from '../../config'
+import { Constantes } from "../../config";
+import { useSession } from "../../common/hooks/useSession";
+import { useAuth } from "../../common/context/auth";
 
 export const Ubicaciones_conf = () => {
+  const { usuario } = useAuth();
+
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [ubicacion, setUbicacion] = useState<UbicacionType | null>();
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
@@ -23,24 +27,27 @@ export const Ubicaciones_conf = () => {
     useState(false);
 
   const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
 
   // Variables de páginado
   const [limite, setLimite] = useState<number>(10);
   const [pagina, setPagina] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const acciones: Array<ReactNode> = [
-    <Button
-      variant={"contained"}
-      sx={{ ml: 1, mr: 1, textTransform: "none" }}
-      key={`accionAgregarUbicacion`}
-      size={"small"}
-      color="success"
-      onClick={() => {
-        agregarUbicacionModal();
-      }}
-    >
-      <AddCircleIcon /> Añadir Ubicacion
-    </Button>,
+    usuario?.rol === "ADMINISTRADOR" && (
+      <Button
+        variant={"contained"}
+        sx={{ ml: 1, mr: 1, textTransform: "none" }}
+        key={`accionAgregarUbicacion`}
+        size={"small"}
+        color="success"
+        onClick={() => {
+          agregarUbicacionModal();
+        }}
+      >
+        <AddCircleIcon /> Añadir Ubicacion
+      </Button>
+    ),
   ];
   const paginacion = (
     <Paginacion
@@ -70,21 +77,42 @@ export const Ubicaciones_conf = () => {
 
   /**********************************************************************************/
   const peticionUbicaciones = async () => {
-    console.log("Obteniendo datos");
-    const data = await axios.get(`${Constantes.baseUrl}/ubicaciones`);
-    setUbicacionesData(data.data[0]);
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/ubicaciones`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+        },
+      });
+      setUbicacionesData(respuesta[0]);
+      setTotal(respuesta.datos?.total);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const eliminarUbicacionPeticion = async () => {
-    //setLoading(true);
-    await axios
-      .patch(`${Constantes.baseUrl}/ubicaciones/${ubicacion?.id}/inactivar`)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/ubicaciones/${ubicacion?.id}/inactivar`,
+        tipo: "patch",
       });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   /**********************************************************************************/
 
@@ -110,36 +138,38 @@ export const Ubicaciones_conf = () => {
         alignContent={"center"}
         alignItems={"center"}
       >
-        {/* {permisos.update && rolUbicacion?.nombre === ROL_USUARIO && ( */}
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionAgregarUbicacion`}
-            size={"small"}
-            //color="error"
-            onClick={() => {
-              editarUbicacionModal(ubicacionData);
-            }}
-          >
-            <Edit />
-          </Button>
-        </Grid>
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionSimuladorAlarma`}
-            size={"small"}
-            color="error"
-            onClick={async () => {
-              await eliminarUbicacionModal(ubicacionData);
-            }}
-          >
-            <Delete />
-          </Button>
-        </Grid>
-        {/* )} */}
+        {usuario?.rol === "ADMINISTRADOR" && (
+          <>
+            <Grid>
+              <Button
+                variant={"text"}
+                sx={{ ml: 1, mr: 1, textTransform: "none" }}
+                key={`accionAgregarUbicacion`}
+                size={"small"}
+                //color="error"
+                onClick={() => {
+                  editarUbicacionModal(ubicacionData);
+                }}
+              >
+                <Edit />
+              </Button>
+            </Grid>
+            <Grid>
+              <Button
+                variant={"text"}
+                sx={{ ml: 1, mr: 1, textTransform: "none" }}
+                key={`accionSimuladorAlarma`}
+                size={"small"}
+                color="error"
+                onClick={async () => {
+                  await eliminarUbicacionModal(ubicacionData);
+                }}
+              >
+                <Delete />
+              </Button>
+            </Grid>
+          </>
+        )}
       </Grid>,
     ]
   );
@@ -175,9 +205,7 @@ export const Ubicaciones_conf = () => {
       <AlertDialog
         isOpen={mostrarAlertaEliminarUbicacion}
         titulo={"Alerta"}
-        texto={`¿Está seguro de Eliminar el ubicacion  ${
-          ubicacion?.nombre
-        } ?`}
+        texto={`¿Está seguro de Eliminar el ubicacion  ${ubicacion?.nombre} ?`}
       >
         <Button onClick={cancelarAlertaEliminarUbicacion}>Cancelar</Button>
         <Button onClick={aceptarAlertaEliminarUbicacion}>Aceptar</Button>

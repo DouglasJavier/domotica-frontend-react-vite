@@ -13,6 +13,7 @@ import { useAlerts } from "../../common/hooks";
 import { AlertDialog } from "../../common/components/ui";
 import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 export const Usuarios_conf = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -21,6 +22,8 @@ export const Usuarios_conf = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [usuariosData, setUsuariosData] = useState<UsuarioType[]>([]);
   const [mostrarAlertaEliminarUsuario, setMostrarAlertaEliminarUsuario] =
+    useState(false);
+  const [mostrarAlertaActivarUsuario, setMostrarAlertaActivarUsuario] =
     useState(false);
 
   const { Alerta } = useAlerts();
@@ -72,9 +75,6 @@ export const Usuarios_conf = () => {
 
   /**********************************************************************************/
   const peticionUsuarios = async () => {
-  
-    /* const data = await axios.get(`${Constantes.baseUrl}/usuarios`);
-    setUsuariosData(data.data[0]); */
     try {
       setLoading(true);
 
@@ -96,14 +96,23 @@ export const Usuarios_conf = () => {
 
   const eliminarUsuarioPeticion = async () => {
     //setLoading(true);
-    await axios
-      .patch(`${Constantes.baseUrl}/usuarios/${usuario?.id}/inactivar`)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/usuarios/${usuario?.id}/inactivar`,
+        tipo: "patch",
       });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   /**********************************************************************************/
 
@@ -113,6 +122,7 @@ export const Usuarios_conf = () => {
     { campo: "apellidos", nombre: "Apellidos" },
     { campo: "usuario", nombre: "Usuario" },
     { campo: "rol", nombre: "Rol" },
+    { campo: "estado", nombre: "Estado" },
     { campo: "acciones", nombre: "Acciones" },
   ];
 
@@ -142,6 +152,14 @@ export const Usuarios_conf = () => {
         <Chip
           label={usuarioData.rol}
           key={`${usuarioData.id}-${indexUsuario}- rol`}
+        />
+      </>,
+      <>
+        <Chip
+          label={usuarioData.estado}
+          key={`${usuarioData.id}-${indexUsuario}- rol`}
+          variant="outlined"
+          color={usuarioData.estado === "ACTIVO" ? "success" : "error"}
         />
       </>,
       <Grid
@@ -179,6 +197,22 @@ export const Usuarios_conf = () => {
             <Delete />
           </Button>
         </Grid>
+        {usuarioData.estado !== "ACTIVO" && (
+          <Grid>
+            <Button
+              variant={"text"}
+              sx={{ ml: 1, mr: 1, textTransform: "none" }}
+              key={`accionSimuladorAlarma`}
+              size={"small"}
+              color="error"
+              onClick={async () => {
+                await eliminarUsuarioModal(usuarioData);
+              }}
+            >
+              <RestartAltIcon />
+            </Button>
+          </Grid>
+        )}
         {/* )} */}
       </Grid>,
     ]
@@ -186,6 +220,10 @@ export const Usuarios_conf = () => {
   const eliminarUsuarioModal = async (usuarioData: UsuarioType) => {
     setUsuario(usuarioData); // para mostrar datos de articulo en la alerta
     setMostrarAlertaEliminarUsuario(true); // para mostrar alerta de articulos
+  };
+  const activarUsuarioModal = async (usuarioData: UsuarioType) => {
+    setUsuario(usuarioData); // para mostrar datos de articulo en la alerta
+    setMostrarAlertaActivarUsuario(true); // para mostrar alerta de articulos
   };
   const aceptarAlertaEliminarUsuario = async () => {
     setMostrarAlertaEliminarUsuario(false);
@@ -216,6 +254,16 @@ export const Usuarios_conf = () => {
         isOpen={mostrarAlertaEliminarUsuario}
         titulo={"Alerta"}
         texto={`¿Está seguro de Eliminar el usuario  ${
+          usuario?.nombres + " " + usuario?.apellidos
+        } ?`}
+      >
+        <Button onClick={cancelarAlertaEliminarUsuario}>Cancelar</Button>
+        <Button onClick={aceptarAlertaEliminarUsuario}>Aceptar</Button>
+      </AlertDialog>
+      <AlertDialog
+        isOpen={mostrarAlertaEliminarUsuario}
+        titulo={"Alerta"}
+        texto={`¿Está seguro de Restaurar el usuario  ${
           usuario?.nombres + " " + usuario?.apellidos
         } ?`}
       >

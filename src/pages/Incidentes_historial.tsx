@@ -11,10 +11,14 @@ import { HistorialType } from "../components/historial-incidentes/types/historia
 import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { ModalIncidente } from "../components/historial-incidentes/ModalIncidentes";
-import { Constantes } from '../../config'
-
+import { Constantes } from "../../config";
+import { useSession } from "../../common/hooks/useSession";
+import { useAuth } from "../../common/context/auth";
 
 export const Incidentes_historial = () => {
+  const { sesionPeticion } = useSession();
+  const { usuario } = useAuth();
+
   const [loading, setLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [incidentes, setIncidentes] = useState<HistorialType | null>();
@@ -33,18 +37,20 @@ export const Incidentes_historial = () => {
   const [pagina, setPagina] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const acciones: Array<ReactNode> = [
-    <Button
-      variant={"contained"}
-      sx={{ ml: 1, mr: 1, textTransform: "none" }}
-      key={`accionAgregarArticulo`}
-      size={"small"}
-      color="error"
-      onClick={() => {
-        agregarhistorialModal();
-      }}
-    >
-      Eliminar historial
-    </Button>,
+    usuario?.rol === "ADMINISTRADOR" && (
+      <Button
+        variant={"contained"}
+        sx={{ ml: 1, mr: 1, textTransform: "none" }}
+        key={`accionAgregarArticulo`}
+        size={"small"}
+        color="error"
+        onClick={() => {
+          agregarhistorialModal();
+        }}
+      >
+        Eliminar historial
+      </Button>
+    ),
   ];
   const paginacion = (
     <Paginacion
@@ -58,24 +64,43 @@ export const Incidentes_historial = () => {
   const { Alerta } = useAlerts();
   /**************************************************************************/
   const peticionHistorialIncidentes = async () => {
-    console.log("Obteniendo datos");
-    const data = await axios.get(`${Constantes.baseUrl}/historialIncidentes`);
-    setHistorialIncidentesData(data.data[0]);
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/historialIncidentes`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+        },
+      });
+      setHistorialIncidentesData(respuesta[0]);
+      setTotal(respuesta.datos?.total);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   const eliminarHistorialIncidentePeticion = async (
     historialData: HistorialType
   ) => {
-    //setLoading(true);
-    await axios
-      .patch(
-        `${Constantes.baseUrl}/historialIncidentes/${historialIncidente?.id}/limpiar`
-      )
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/historialIncidentes/${historialIncidente?.id}/limpiar`,
+        tipo: "patch",
       });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   /**************************************************************************/
   const cerrarFotoModal = async () => {
@@ -141,22 +166,22 @@ export const Incidentes_historial = () => {
         {/* )} */}
       </Grid>,
       <Grid key={`${historialData.id}-${indexHistorialAD}-accion`}>
-        {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionAgregarArticulo`}
-            size={"small"}
-            color="error"
-            onClick={async () => {
-              await eliminarHistorialModal(historialData);
-            }}
-          >
-            <Delete />
-          </Button>
-        </Grid>
-        {/* )} */}
+        {usuario?.rol === "ADMINISTRADOR" && (
+          <Grid>
+            <Button
+              variant={"text"}
+              sx={{ ml: 1, mr: 1, textTransform: "none" }}
+              key={`accionAgregarArticulo`}
+              size={"small"}
+              color="error"
+              onClick={async () => {
+                await eliminarHistorialModal(historialData);
+              }}
+            >
+              <Delete />
+            </Button>
+          </Grid>
+        )}
       </Grid>,
     ]
   );

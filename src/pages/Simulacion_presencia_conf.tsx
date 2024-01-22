@@ -31,7 +31,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { AlertDialog } from "../../common/components/ui";
-import { Constantes } from '../../config'
+import { Constantes } from "../../config";
+import { useSession } from "../../common/hooks/useSession";
+import { useAuth } from "../../common/context/auth";
 
 export const Simulacion_presencia_conf = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -47,20 +49,24 @@ export const Simulacion_presencia_conf = () => {
   const [mostrarAlertaEliminarSimulador, setMostrarAlertaEliminarSimulador] =
     useState(false);
   const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
+  const { usuario } = useAuth();
 
   const acciones: Array<ReactNode> = [
-    <Button
-      variant={"contained"}
-      sx={{ ml: 1, mr: 1, textTransform: "none" }}
-      key={`accionAgregarArticulo`}
-      size={"small"}
-      color="success"
-      onClick={() => {
-        agregarsimuladorModal();
-      }}
-    >
-      <AddCircleIcon /> Añadir simulador
-    </Button>,
+    usuario?.rol === "ADMINISTRADOR" && (
+      <Button
+        variant={"contained"}
+        sx={{ ml: 1, mr: 1, textTransform: "none" }}
+        key={`accionAgregarArticulo`}
+        size={"small"}
+        color="success"
+        onClick={() => {
+          agregarsimuladorModal();
+        }}
+      >
+        <AddCircleIcon /> Añadir simulador
+      </Button>
+    ),
   ];
   const paginacion = (
     <Paginacion
@@ -89,29 +95,57 @@ export const Simulacion_presencia_conf = () => {
   };
   /**********************************************************************************/
   const peticionSimuladores = async () => {
-    console.log("Obteniendo datos");
-    const data = await axios.get(`${Constantes.baseUrl}/simuladores`);
-    setSimuladoresData(data.data[0]);
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/simuladores`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+        },
+      });
+      setSimuladoresData(respuesta[0]);
+      setTotal(respuesta.datos?.total);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const peticionActuadores = async () => {
-    console.log("Obteniendo datos");
-    const data = await axios.get(
-      `${Constantes.baseUrl}/dispositivos/listarActuadores`
-    );
-    setActuadoresData(data.data[0]);
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/dispositivos/listarActuadores`,
+      });
+      setActuadoresData(respuesta[0]);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const eliminarSimuladorPeticion = async () => {
-    //setLoading(true);
-    await axios
-      .patch(`${Constantes.baseUrl}/simuladores/${simulador?.id}/inactivar`)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/simuladores/${simulador?.id}/inactivar`,
+        tipo: "patch",
       });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   /**********************************************************************************/
 
@@ -121,9 +155,9 @@ export const Simulacion_presencia_conf = () => {
     { campo: "actuadoresSimulacion", nombre: "Actuadores" },
     { campo: "acciones", nombre: "" },
   ];
-
-  const contenidoTabla: Array<Array<ReactNode>> = simuladoresData.map(
-    (simuladorData, indexsimulador) => [
+  const contenidoTabla: Array<Array<ReactNode>> = simuladoresData
+    .slice(1)
+    .map((simuladorData, indexsimulador) => [
       <Typography
         key={`${simuladorData.id}-${indexsimulador}-id_simulador`}
         variant={"body2"}
@@ -174,37 +208,39 @@ export const Simulacion_presencia_conf = () => {
         alignContent={"center"}
         alignItems={"center"}
       >
-        {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`${simuladorData.id}-${indexsimulador}-accionEditar`}
-            size={"small"}
-            onClick={() => {
-              editarSimuladorModal(simuladorData);
-            }}
-          >
-            <EditIcon />
-          </Button>
-        </Grid>
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionSimuladorAlarma`}
-            size={"small"}
-            color="error"
-            onClick={async () => {
-              await eliminarSimuladorModal(simuladorData);
-            }}
-          >
-            <Delete />
-          </Button>
-        </Grid>
+        {usuario?.rol === "ADMINISTRADOR" && (
+          <>
+            <Grid>
+              <Button
+                variant={"text"}
+                sx={{ ml: 1, mr: 1, textTransform: "none" }}
+                key={`${simuladorData.id}-${indexsimulador}-accionEditar`}
+                size={"small"}
+                onClick={() => {
+                  editarSimuladorModal(simuladorData);
+                }}
+              >
+                <EditIcon />
+              </Button>
+            </Grid>
+            <Grid>
+              <Button
+                variant={"text"}
+                sx={{ ml: 1, mr: 1, textTransform: "none" }}
+                key={`accionSimuladorAlarma`}
+                size={"small"}
+                color="error"
+                onClick={async () => {
+                  await eliminarSimuladorModal(simuladorData);
+                }}
+              >
+                <Delete />
+              </Button>
+            </Grid>
+          </>
+        )}
       </Grid>,
-    ]
-  );
+    ]);
 
   const eliminarSimuladorModal = async (simuladorData: SimuladorType) => {
     setSimulador(simuladorData); // para mostrar datos de articulo en la alerta

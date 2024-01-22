@@ -18,7 +18,8 @@ import axios from "axios";
 import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import dayjs from "dayjs";
-import { Constantes } from '../../../config'
+import { Constantes } from "../../../config";
+import { useSession } from "../../../common/hooks/useSession";
 
 interface IntervaloFechaType {
   fechaInicio: string;
@@ -41,10 +42,11 @@ export const ModalActivarDesactivar = ({
       },
     });
   const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
 
   const defaultOption = { key: "", value: "", label: "" };
 
- /*  const [defaultActuadorData, setDefaultActuadorData] =
+  /*  const [defaultActuadorData, setDefaultActuadorData] =
     useState<optionType>(defaultOption); */
   const guardarEliminarHistorial = async (data: IntervaloFechaType) => {
     await peticionEliminarHistorial(data);
@@ -52,21 +54,24 @@ export const ModalActivarDesactivar = ({
   };
   const peticionEliminarHistorial = async (historial: IntervaloFechaType) => {
     {
-      //setLoading(true);
-      await axios
-        .patch(
-          `${Constantes.baseUrl}/historialActivarDesactivar/limpiarPorFecha`, 
-            {
-              fechaInicio: dayjs(getValues().fechaInicio).format('DD/MM/YYYY'),
-              fechaFin: dayjs(getValues().fechaFin).format('DD/MM/YYYY')
-            },
-        )
-        .then((res) => {
-          Alerta({ mensaje: `completado con exito`, variant: "success" });
-        })
-        .catch((err) => {
-          Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+      try {
+        const respuesta = await sesionPeticion({
+          url: `${Constantes.baseUrl}/historialActivarDesactivar/limpiarPorFecha`,
+          tipo: "patch",
+          body:  {
+            fechaInicio: dayjs(getValues().fechaInicio).format("DD/MM/YYYY"),
+            fechaFin: dayjs(getValues().fechaFin).format("DD/MM/YYYY"),
+          },
         });
+        Alerta({
+          mensaje: InterpreteMensajes(respuesta),
+          variant: "success",
+        });
+        accionCorrecta();
+      } catch (e) {
+        Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+      } finally {
+      }
     }
   };
   return (
@@ -74,7 +79,7 @@ export const ModalActivarDesactivar = ({
       <DialogTitle>
         {" Eliminar historial de incidentes de seguridad: "}
       </DialogTitle>
-      
+
       <DialogContent dividers>
         <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
           <Grid item xs={12} sm={12} md={6}>

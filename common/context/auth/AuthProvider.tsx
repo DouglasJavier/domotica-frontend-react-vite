@@ -58,12 +58,15 @@ export const AuthProvider = ({ children }: AuthContextType) => {
     }
 
     try {
-      await delay(1000);
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/usuarios/perfil`,
+        headers: {},
+        tipo: 'get'
+      });
+      setUser(respuesta);
     } catch (error: Error | any) {
       borrarSesionUsuario();
-      /* await router.replace({
-        pathname: "/login",
-      }); */
+
       throw error;
     } finally {
       setLoading(false);
@@ -115,9 +118,10 @@ export const AuthProvider = ({ children }: AuthContextType) => {
       console.log(usuario);
       console.log(contrasena);
       console.log(Constantes.baseUrl);
+      const pass = btoa(contrasena);
       const respuesta = await Servicios.post({
         url: `${Constantes.baseUrl}/auth`,
-        body: { usuario, contrasena },
+        body: { usuario, contrasena: pass },
         headers: {},
       });
       /* await axios
@@ -133,8 +137,7 @@ export const AuthProvider = ({ children }: AuthContextType) => {
         }); */
 
       guardarCookie("token", respuesta.access_token);
-
-      setUser(respuesta.datos);
+      setUser(respuesta);
       navigate("/admin", { replace: true });
     } catch (e) {
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });

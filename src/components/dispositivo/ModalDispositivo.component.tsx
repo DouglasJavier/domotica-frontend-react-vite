@@ -28,7 +28,8 @@ import { UbicacionType } from "../alarma/types/alarmaCRUD";
 import axios from "axios";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import { useAlerts } from "../../../common/hooks";
-import { Constantes } from '../../../config'
+import { Constantes } from "../../../config";
+import { useSession } from "../../../common/hooks/useSession";
 
 interface TipoType {
   id: string;
@@ -48,6 +49,7 @@ export const ModalDispositivo = ({
   accionCorrecta,
 }: ModalDispositivoProps) => {
   const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
 
   const { handleSubmit, control, getValues } = useForm<DispositivoCRUDType>({
     defaultValues: {
@@ -99,36 +101,25 @@ export const ModalDispositivo = ({
   const xs = useMediaQuery(theme.breakpoints.only("xs"));
 
   const guardarActualizarDispositivo = async (data: DispositivoCRUDType) => {
-    if (dispositivo) {
-      await patchDispositivoPeticion(data);
+    try {
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/dispositivos${
+          dispositivo?.id ? `/${dispositivo.id}` : ""
+        }`,
+        tipo: dispositivo?.id ? "patch" : "post",
+        body: data,
+      });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
       accionCorrecta();
-    } else {
-      await postDispositivoPeticion(data);
-      accionCorrecta();
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
     }
   };
-  const postDispositivoPeticion = async (elem: DispositivoCRUDType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .post(`${Constantes.baseUrl}/dispositivos`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
-  };
-  const patchDispositivoPeticion = async (elem: DispositivoCRUDType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .patch(`${Constantes.baseUrl}/dispositivos/${dispositivo?.id}`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
-  };
+
   return (
     <form onSubmit={handleSubmit(guardarActualizarDispositivo)}>
       <DialogTitle>
@@ -292,8 +283,7 @@ export const ModalDispositivo = ({
         }}
       >
         <Button variant="contained" color="success" type="submit">
-        {dispositivo
-          ? 'Editar Dispositivo' : 'Añadir Dispositivo'}
+          {dispositivo ? "Editar Dispositivo" : "Añadir Dispositivo"}
         </Button>
         <Button variant="contained" color="error" onClick={accionCancelar}>
           Salir

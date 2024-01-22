@@ -51,7 +51,7 @@ export const ModalContacto = ({
      
     try {
       const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/alarmas${
+        url: `${Constantes.baseUrl}/contactos${
           contacto?.id ? `/${contacto.id}` : ''
         }`,
         tipo: contacto?.id ? 'patch' : 'post',

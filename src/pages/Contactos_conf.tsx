@@ -11,7 +11,9 @@ import axios from "axios";
 import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { AlertDialog } from "../../common/components/ui";
-import { Constantes } from '../../config'
+import { Constantes } from "../../config";
+import { useSession } from "../../common/hooks/useSession";
+import { useAuth } from "../../common/context/auth";
 
 //import { ModalContactoFotos } from "../components/contacto-activacion/RowContactoActivacion.component";
 export const Contactos_conf = () => {
@@ -24,24 +26,28 @@ export const Contactos_conf = () => {
     useState(false);
 
   const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
+  const { usuario } = useAuth();
 
   // Variables de páginado
   const [limite, setLimite] = useState<number>(10);
   const [pagina, setPagina] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const acciones: Array<ReactNode> = [
-    <Button
-      variant={"contained"}
-      sx={{ ml: 1, mr: 1, textTransform: "none" }}
-      key={`accionAgregarContacto`}
-      size={"small"}
-      color="success"
-      onClick={() => {
-        agregarContactoModal();
-      }}
-    >
-      <AddCircleIcon /> Añadir Contacto
-    </Button>,
+    usuario?.rol === "ADMINISTRADOR" && (
+      <Button
+        variant={"contained"}
+        sx={{ ml: 1, mr: 1, textTransform: "none" }}
+        key={`accionAgregarContacto`}
+        size={"small"}
+        color="success"
+        onClick={() => {
+          agregarContactoModal();
+        }}
+      >
+        <AddCircleIcon /> Añadir Contacto
+      </Button>
+    ),
   ];
   const paginacion = (
     <Paginacion
@@ -71,21 +77,42 @@ export const Contactos_conf = () => {
 
   /**********************************************************************************/
   const peticionContactos = async () => {
-    console.log("Obteniendo datos");
-    console.log(Constantes.baseUrl);
-    const data = await axios.get(`${Constantes.baseUrl}/contactos`);
-    setContactosData(data.data[0]);
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/contactos`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+        },
+      });
+      setContactosData(respuesta[0]);
+      setTotal(respuesta.datos?.total);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   const eliminarContactoPeticion = async () => {
     //setLoading(true);
-    await axios
-      .patch(`${Constantes.baseUrl}/contactos/${contacto?.id}/inactivar`)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/contactos/${contacto?.id}/inactivar`,
+        tipo: "patch",
       });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   /**********************************************************************************/
 
@@ -145,36 +172,38 @@ export const Contactos_conf = () => {
         alignContent={"center"}
         alignItems={"center"}
       >
-        {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionAgregarArticulo`}
-            size={"small"}
-            //color="error"
-            onClick={() => {
-              editarContactoModal(contactoData);
-            }}
-          >
-            <Edit />
-          </Button>
-        </Grid>
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionSimuladorAlarma`}
-            size={"small"}
-            color="error"
-            onClick={async () => {
-              await eliminarContactoModal(contactoData);
-            }}
-          >
-            <Delete />
-          </Button>
-        </Grid>
-        {/* )} */}
+        {usuario?.rol === "ADMINISTRADOR" && (
+          <>
+            <Grid>
+              <Button
+                variant={"text"}
+                sx={{ ml: 1, mr: 1, textTransform: "none" }}
+                key={`accionAgregarArticulo`}
+                size={"small"}
+                //color="error"
+                onClick={() => {
+                  editarContactoModal(contactoData);
+                }}
+              >
+                <Edit />
+              </Button>
+            </Grid>
+            <Grid>
+              <Button
+                variant={"text"}
+                sx={{ ml: 1, mr: 1, textTransform: "none" }}
+                key={`accionSimuladorAlarma`}
+                size={"small"}
+                color="error"
+                onClick={async () => {
+                  await eliminarContactoModal(contactoData);
+                }}
+              >
+                <Delete />
+              </Button>
+            </Grid>
+          </>
+        )}
       </Grid>,
     ]
   );
@@ -227,7 +256,9 @@ export const Contactos_conf = () => {
       <AlertDialog
         isOpen={mostrarAlertaEliminarContacto}
         titulo={"Alerta"}
-        texto={`¿Está seguro de Eliminar el contacto  ${contacto?.nombre + ' ' + contacto?.apellido} ?`}
+        texto={`¿Está seguro de Eliminar el contacto  ${
+          contacto?.nombre + " " + contacto?.apellido
+        } ?`}
       >
         <Button onClick={cancelarAlertaEliminarContacto}>Cancelar</Button>
         <Button onClick={aceptarAlertaEliminarContacto}>Aceptar</Button>

@@ -19,10 +19,11 @@ import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import SettingsInputComponentIcon from "@mui/icons-material/SettingsInputComponent";
 import { Children, FC, PropsWithChildren, useState, useContext } from "react";
-import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
+import EditLocationAltIcon from "@mui/icons-material/EditLocationAlt";
 
 import { userContext } from "../App";
 import { NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../../common/context/auth";
 
 const drawerWidth = 240;
 
@@ -32,7 +33,10 @@ interface Props {
 
 export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
   const sideMenuOpen = useContext(userContext).sideMenuOpen;
-
+  const { usuario } = useAuth();
+  console.log("#######################");
+  console.log(usuario);
+  console.log("#######################");
   //const [sideMenuOpen, setSideMenuOpen] = useState<boolean>(true);
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.only("sm"));
@@ -136,9 +140,7 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
                     <Box width={"20px"} />
                     <AddModeratorIcon />
                     <Box width={"20px"} />
-                    <Typography variant={"body1"}>
-                      Alarmas
-                    </Typography>
+                    <Typography variant={"body1"}>Alarmas</Typography>
                   </Box>
                 </ListItemButton>
               </ListItem>
@@ -300,7 +302,6 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
                     },
                   }}
                 >
-
                   <Box
                     sx={{
                       display: "flex",
@@ -345,33 +346,35 @@ export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
                   </Box>
                 </ListItemButton>
               </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={NavLink}
-                  to="/admin/config_usuarios"
-                  sx={{
-                    "&.active": {
-                      backgroundColor: "#E5E5E5",
-                    },
-                  }}
-                >
-                  <Box
+              {usuario?.rol === "ADMINISTRADOR" && (
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={NavLink}
+                    to="/admin/config_usuarios"
                     sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      p: "1 2 3 4",
-                      m: 0,
-                      borderRadius: 1,
-                      alignItems: "center",
+                      "&.active": {
+                        backgroundColor: "#E5E5E5",
+                      },
                     }}
                   >
-                    <Box width={"20px"} />
-                    <ManageAccountsIcon />
-                    <Box width={"20px"} />
-                    <Typography variant={"body1"}>Usuarios</Typography>
-                  </Box>
-                </ListItemButton>
-              </ListItem>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        p: "1 2 3 4",
+                        m: 0,
+                        borderRadius: 1,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Box width={"20px"} />
+                      <ManageAccountsIcon />
+                      <Box width={"20px"} />
+                      <Typography variant={"body1"}>Usuarios</Typography>
+                    </Box>
+                  </ListItemButton>
+                </ListItem>
+              )}
             </List>
           </Box>
         </Drawer>

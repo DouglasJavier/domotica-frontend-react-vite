@@ -12,7 +12,9 @@ import { UbicacionType } from "../components/alarma/types/alarmaCRUD";
 import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { AlertDialog } from "../../common/components/ui";
-import { Constantes } from '../../config'
+import { Constantes } from "../../config";
+import { useSession } from "../../common/hooks/useSession";
+import { useAuth } from "../../common/context/auth";
 
 export const Dispositivos_conf = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -23,9 +25,13 @@ export const Dispositivos_conf = () => {
   const [ubicacionesData, setUbicacionesData] = useState<
     UbicacionType[] | null
   >();
-  const [mostrarAlertaEliminarDispositivo, setMostrarAlertaEliminarDispositivo] =
-  useState(false);
+  const [
+    mostrarAlertaEliminarDispositivo,
+    setMostrarAlertaEliminarDispositivo,
+  ] = useState(false);
   const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
+  const { usuario } = useAuth();
 
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -34,18 +40,20 @@ export const Dispositivos_conf = () => {
   const [pagina, setPagina] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const acciones: Array<ReactNode> = [
-    <Button
-      variant={"contained"}
-      sx={{ ml: 1, mr: 1, textTransform: "none" }}
-      key={`accionAgregarDispositivo`}
-      size={"small"}
-      color="success"
-      onClick={() => {
-        agregarDispositivoModal();
-      }}
-    >
-      <AddCircleIcon /> Añadir Dispositivo
-    </Button>,
+    usuario?.rol === "ADMINISTRADOR" && (
+      <Button
+        variant={"contained"}
+        sx={{ ml: 1, mr: 1, textTransform: "none" }}
+        key={`accionAgregarDispositivo`}
+        size={"small"}
+        color="success"
+        onClick={() => {
+          agregarDispositivoModal();
+        }}
+      >
+        <AddCircleIcon /> Añadir Dispositivo
+      </Button>
+    ),
   ];
   const paginacion = (
     <Paginacion
@@ -78,27 +86,62 @@ export const Dispositivos_conf = () => {
   };
   /**********************************************************************************/
   const peticionDispositivos = async () => {
-    console.log("Obteniendo datos");
-    const data = await axios.get(`${Constantes.baseUrl}/dispositivos`);
-    setDispositivosData(data.data[0]);
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/dispositivos`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+        },
+      });
+      setDispositivosData(respuesta[0]);
+      setTotal(respuesta.datos?.total);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const peticionUbicaciones = async () => {
-    console.log("Obteniendo datos");
-    const data = await axios.get(`${Constantes.baseUrl}/ubicaciones`);
-    setUbicacionesData(data.data[0]);
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/ubicaciones`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+        },
+      });
+      setUbicacionesData(respuesta[0]);
+      setTotal(respuesta.datos?.total);
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const eliminarDispositivoPeticion = async () => {
-    //setLoading(true);
-    await axios
-      .patch(`${Constantes.baseUrl}/dispositivos/${dispositivo?.id}/inactivar`)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/dispositivos/${dispositivo?.id}/inactivar`,
+        tipo: "patch",
       });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   /**********************************************************************************/
 
@@ -180,36 +223,38 @@ export const Dispositivos_conf = () => {
         alignContent={"center"}
         alignItems={"center"}
       >
-        {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionAgregarArticulo`}
-            size={"small"}
-            //color="error"
-            onClick={() => {
-              editarDispositivoModal(dispositivoData);
-            }}
-          >
-            <Edit />
-          </Button>
-        </Grid>
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionSimuladorAlarma`}
-            size={"small"}
-            color="error"
-            onClick={async () => {
-              await eliminarDispositivoModal(dispositivoData);
-            }}
-          >
-            <Delete />
-          </Button>
-        </Grid>
-        {/* )} */}
+        {usuario?.rol === "ADMINISTRADOR" && (
+          <>
+            <Grid>
+              <Button
+                variant={"text"}
+                sx={{ ml: 1, mr: 1, textTransform: "none" }}
+                key={`accionAgregarArticulo`}
+                size={"small"}
+                //color="error"
+                onClick={() => {
+                  editarDispositivoModal(dispositivoData);
+                }}
+              >
+                <Edit />
+              </Button>
+            </Grid>
+            <Grid>
+              <Button
+                variant={"text"}
+                sx={{ ml: 1, mr: 1, textTransform: "none" }}
+                key={`accionSimuladorAlarma`}
+                size={"small"}
+                color="error"
+                onClick={async () => {
+                  await eliminarDispositivoModal(dispositivoData);
+                }}
+              >
+                <Delete />
+              </Button>
+            </Grid>
+          </>
+        )}
       </Grid>,
     ]
   );

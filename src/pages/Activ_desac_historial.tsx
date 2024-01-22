@@ -12,8 +12,9 @@ import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import { AlertDialog } from "../../common/components/ui";
 import { ModalActivarDesactivar } from "../components/historial-activacion/ModalActivarDesactivar";
-import { Constantes } from '../../config'
+import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
+import { useAuth } from "../../common/context/auth";
 
 //import { ModalalarmaFotos } from "../components/historial-activacion/RowalarmaActivacion.component";
 
@@ -26,6 +27,7 @@ interface alarmaType {
 }
 export const Activ_desac_historial = () => {
   const { sesionPeticion } = useSession();
+  const { usuario } = useAuth();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [alarma, setalarma] = useState<alarmaType | null>();
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
@@ -43,18 +45,20 @@ export const Activ_desac_historial = () => {
   const [modalHistorial, setModalHistorial] = useState<boolean>(false);
 
   const acciones: Array<ReactNode> = [
-    <Button
-      variant={"contained"}
-      sx={{ ml: 1, mr: 1, textTransform: "none" }}
-      key={`accionAgregarArticulo`}
-      size={"small"}
-      color="error"
-      onClick={() => {
-        agregarhistorialModal();
-      }}
-    >
-      Eliminar historial
-    </Button>,
+    usuario?.rol === "ADMINISTRADOR" && (
+      <Button
+        variant={"contained"}
+        sx={{ ml: 1, mr: 1, textTransform: "none" }}
+        key={`accionAgregarArticulo`}
+        size={"small"}
+        color="error"
+        onClick={() => {
+          agregarhistorialModal();
+        }}
+      >
+        Eliminar historial
+      </Button>
+    ),
   ];
   const paginacion = (
     <Paginacion
@@ -69,11 +73,6 @@ export const Activ_desac_historial = () => {
 
   /**************************************************************************/
   const peticionHistorialActivarDesactivar = async () => {
-    /* console.log("Obteniendo datos");
-    const data = await axios.get(
-      `${Constantes.baseUrl}/historialActivarDesactivar`
-    );
-    setHistorialActivarDesactivarData(data.data[0]); */
     try {
       setLoading(true);
 
@@ -84,7 +83,7 @@ export const Activ_desac_historial = () => {
           limite: limite,
         },
       });
-      setHistorialActivarDesactivar(respuesta[0]);
+      setHistorialActivarDesactivarData(respuesta[0]);
       setTotal(respuesta.datos?.total);
     } catch (e) {
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
@@ -95,17 +94,22 @@ export const Activ_desac_historial = () => {
   const eliminarHistorialIncidentePeticion = async (
     historialData: HistorialActivarDesactivarType
   ) => {
-    //setLoading(true);
-    await axios
-      .patch(
-        `${Constantes.baseUrl}/historialActivarDesactivar/${historialActivarDesactivar?.id}/limpiar`
-      )
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
+    try {
+      setLoading(true);
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}}/historialActivarDesactivar/${historialActivarDesactivar?.id}/limpiar`,
+        tipo: "patch",
       });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
   /**************************************************************************/
   const agregaralarmaModal = () => {
@@ -164,22 +168,22 @@ export const Activ_desac_historial = () => {
         key={`${historialData.id}-${index}- accion`}
       />,
       <Grid key={`${historialData.id}-${index}-accion`}>
-        {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionAgregarArticulo`}
-            size={"small"}
-            color="error"
-            onClick={async () => {
-              await eliminarHistorialModal(historialData);
-            }}
-          >
-            <Delete />
-          </Button>
-        </Grid>
-        {/* )} */}
+        {usuario?.rol === "ADMINISTRADOR" && (
+          <Grid>
+            <Button
+              variant={"text"}
+              sx={{ ml: 1, mr: 1, textTransform: "none" }}
+              key={`accionAgregarArticulo`}
+              size={"small"}
+              color="error"
+              onClick={async () => {
+                await eliminarHistorialModal(historialData);
+              }}
+            >
+              <Delete />
+            </Button>
+          </Grid>
+        )}
       </Grid>,
     ]);
 
@@ -240,7 +244,7 @@ export const Activ_desac_historial = () => {
             refrescar().finally();
           }}
         />
-        </Dialog>
+      </Dialog>
       <Grid item xs={12} sm={12} md={10} lg={10} xl={10} marginTop={"3%"}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>
           <CustomDataTable

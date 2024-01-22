@@ -18,7 +18,8 @@ import axios from "axios";
 import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import { AlertDialog } from "../../../common/components/ui";
-import { Constantes } from '../../../config'
+import { Constantes } from "../../../config";
+import { useSession } from "../../../common/hooks/useSession";
 
 interface ModalSimulacionProps {
   ubicacion?: UbicacionType | null;
@@ -38,43 +39,32 @@ export const ModalUbicacion = ({
         nombre: ubicacion?.nombre,
       },
     });
-    const { Alerta } = useAlerts();
+  const { Alerta } = useAlerts();
+  const { sesionPeticion } = useSession();
+
   console.log("*******************************************");
   console.log(getValues());
   console.log("*******************************************");
   const defaultOption = { key: "", value: "", label: "" };
 
   const guardarActualizarUbicacion = async (data: UbicacionType) => {
-    if (ubicacion) {
-      await patchUbicacionPeticion(data);
+    try {
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/ubicaciones${
+          ubicacion?.id ? `/${ubicacion.id}` : ""
+        }`,
+        tipo: ubicacion?.id ? "patch" : "post",
+        body: data,
+      });
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: "success",
+      });
       accionCorrecta();
-    } else {
-      await postUbicacionPeticion(data);
-      accionCorrecta();
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
     }
-  };
-
-  const postUbicacionPeticion = async (elem: UbicacionType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .post(`${Constantes.baseUrl}/ubicaciones`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
-  };
-  const patchUbicacionPeticion = async (elem: UbicacionType) => {
-    console.log("enviado datos");
-    const subiendo = await axios
-      .patch(`${Constantes.baseUrl}/ubicaciones/${ubicacion?.id}`, elem)
-      .then((res) => {
-        Alerta({ mensaje: `completado con exito`, variant: "success" });
-      })
-      .catch((err) => {
-        Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
-      });
   };
 
   const [defaultActuadorData, setDefaultActuadorData] =
@@ -112,7 +102,7 @@ export const ModalUbicacion = ({
         }}
       >
         <Button variant="contained" color="success" type="submit">
-          {ubicacion ? 'Editar Ubicacion' : 'Añadir Ubicacion' }
+          {ubicacion ? "Editar Ubicacion" : "Añadir Ubicacion"}
         </Button>
         <Button variant="contained" color="error" onClick={accionCancelar}>
           Salir
