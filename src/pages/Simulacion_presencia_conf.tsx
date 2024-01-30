@@ -34,6 +34,7 @@ import { AlertDialog } from "../../common/components/ui";
 import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
 import { useAuth } from "../../common/context/auth";
+import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
 
 export const Simulacion_presencia_conf = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -274,6 +275,7 @@ export const Simulacion_presencia_conf = () => {
   };
   return (
     <>
+      <VerificarIncidentes />
       <Dialog
         open={openModal}
         onClose={cerrarSimuladorModal}

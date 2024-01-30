@@ -29,3 +29,7 @@ export interface FotoType {
   id: string;
   foto: string;
 }
+export interface AtenderIncidenteType {
+  activarSonido: boolean
+  notificacionContactos: boolean
+}

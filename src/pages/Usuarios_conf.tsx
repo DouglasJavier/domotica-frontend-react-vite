@@ -14,6 +14,7 @@ import { AlertDialog } from "../../common/components/ui";
 import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
 
 export const Usuarios_conf = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -250,6 +251,7 @@ export const Usuarios_conf = () => {
   }, [usuario]);
   return (
     <>
+      <VerificarIncidentes />
       <AlertDialog
         isOpen={mostrarAlertaEliminarUsuario}
         titulo={"Alerta"}

@@ -18,6 +18,7 @@ import { SnackbarProvider } from "notistack";
 import { Ubicaciones_conf } from "./pages/Ubicaciones";
 import { Login } from "./pages/Login";
 import { AuthProvider } from "../common/context/auth";
+import { VerificarIncidentes } from "./components/VerificarIncidentes.component";
 
 interface MenuSide {
   sideMenuOpen: boolean;

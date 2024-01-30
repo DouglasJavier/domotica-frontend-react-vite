@@ -7,6 +7,7 @@ import { Constantes } from "../../config";
 import { useAlerts } from "../../common/hooks";
 import { useSession } from "../../common/hooks/useSession";
 import { InterpreteMensajes } from "../../common/utils";
+import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
 
 export const Camaras = () => {
   const [camarasData, setCamarasData] = useState<CamaraType[]>([]);
@@ -34,6 +35,7 @@ export const Camaras = () => {
   }, []);
   return (
     <>
+      <VerificarIncidentes />
       <Grid
         container
         marginTop={"3%"}

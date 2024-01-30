@@ -37,6 +37,7 @@ import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
+import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
 
 interface ColumnaType {
   campo: string;
@@ -133,15 +134,16 @@ export const Activar_desactivar = () => {
   const cambiarEstadoAlarmaPeticion = async (alarmaData: AlarmaType) => {
     //setLoading(true);
     if (alarma?.estado !== "ENCENDIDO") {
+     
       try {
         setLoading(true);
-
+        
         const respuesta = await sesionPeticion({
-          url: `${Constantes.baseUrl}alarmas/${alarma?.id}/${
+          url: `${Constantes.baseUrl}/alarmas/${alarma?.id}/${
             alarma?.estado !== "ENCENDIDO" ? "encender" : "apagar"
           }`,
+          tipo: "patch",
         });
-
         Alerta({
           mensaje: `${InterpreteMensajes(respuesta)}`,
           variant: "success",
@@ -158,7 +160,8 @@ export const Activar_desactivar = () => {
       setLoading(true);
 
       const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}alarmas/${alarma?.id}/eliminar`,
+        url: `${Constantes.baseUrl}/alarmas/${alarma?.id}/eliminar`,
+        tipo: 'patch'
       });
 
       Alerta({
@@ -268,23 +271,23 @@ export const Activar_desactivar = () => {
         )}
         <Typography
           variant="body2"
-          key={`${alarmaData.id}-${indexAlarma}- envio_notificaciones`}
+          key={`${alarmaData.id}-${indexAlarma}- alerta_sonido`}
         >
           <b>Alerta de sonido:</b>{" "}
-          {alarmaData.envio_noti === "3"
+          {alarmaData.envio_noti === "2"
             ? "Preguntar primero"
-            : alarmaData.envio_noti === "2"
+            : alarmaData.envio_noti === "3"
             ? "Automáticamente"
             : "No"}
         </Typography>
         <Typography
           variant="body2"
-          key={`${alarmaData.id}-${indexAlarma}- envio_notificaciones`}
+          key={`${alarmaData.id}-${indexAlarma}- notificacion_contactos`}
         >
           <b>Notificaciones a contactos:</b>{" "}
-          {alarmaData.envio_noti === "3"
+          {alarmaData.envio_noti === "2"
             ? "Preguntar primero"
-            : alarmaData.envio_noti === "2"
+            : alarmaData.envio_noti === "3"
             ? "Automáticamente"
             : "No"}
         </Typography>
@@ -419,6 +422,7 @@ export const Activar_desactivar = () => {
   }, [alarma]);
   return (
     <>
+      <VerificarIncidentes />
       <AlertDialog
         isOpen={mostrarAlertaEstadoAlarma}
         titulo={"Alerta"}

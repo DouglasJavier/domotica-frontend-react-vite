@@ -14,6 +14,7 @@ import { AlertDialog } from "../../common/components/ui";
 import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
 import { useAuth } from "../../common/context/auth";
+import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
 
 export const Ubicaciones_conf = () => {
   const { usuario } = useAuth();
@@ -202,6 +203,7 @@ export const Ubicaciones_conf = () => {
   }, [ubicacion]);
   return (
     <>
+      <VerificarIncidentes />
       <AlertDialog
         isOpen={mostrarAlertaEliminarUbicacion}
         titulo={"Alerta"}

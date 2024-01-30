@@ -15,6 +15,7 @@ import { ModalActivarDesactivar } from "../components/historial-activacion/Modal
 import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
 import { useAuth } from "../../common/context/auth";
+import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
 
 //import { ModalalarmaFotos } from "../components/historial-activacion/RowalarmaActivacion.component";
 
@@ -84,7 +85,7 @@ export const Activ_desac_historial = () => {
         },
       });
       setHistorialActivarDesactivarData(respuesta[0]);
-      setTotal(respuesta.datos?.total);
+      setTotal(respuesta[1]);
     } catch (e) {
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
     } finally {
@@ -219,10 +220,12 @@ export const Activ_desac_historial = () => {
 
   useEffect(() => {
     peticionHistorialActivarDesactivar();
-  }, [historialActivarDesactivar]);
+  }, [historialActivarDesactivar, pagina, limite]);
 
   return (
     <Grid container justifyContent={"center"}>
+      <VerificarIncidentes />
+
       <AlertDialog
         isOpen={mostrarAlertaEliminarHistorial}
         titulo={"Alerta"}
