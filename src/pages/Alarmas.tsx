@@ -6,6 +6,10 @@ import {
   Button,
   Card,
   Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   Switch,
   Typography,
@@ -38,7 +42,10 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
 import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
-
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import { ModalBoton } from "../components/alarma/ModalBoton.component";
 interface ColumnaType {
   campo: string;
   nombre: string;
@@ -52,6 +59,7 @@ export const Activar_desactivar = () => {
 
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [alarma, setAlarma] = useState<AlarmaType | null>();
+  const [idAlarma, setIdAlarma] = useState<string | null>();
   const [alarmasData, setAlarmasData] = useState<AlarmaType[]>([]);
   const [errorArticulosData, setErrorArticulosData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -63,9 +71,11 @@ export const Activar_desactivar = () => {
   const [simuladoresData, setSimuladoresData] = useState<SimuladorType[]>([]);
   const [ubicacionesData, setUbicacionesData] = useState<UbicacionType[]>([]);
   const [mostrarAlertaEstadoAlarma, setMostrarAlertaEstadoAlarma] =
-    useState(false);
+    useState<boolean>(false);
+  const [mostrarActivarBotonPanico, setActivarBotonPanico] =
+    useState<boolean>(false);
   const [mostrarAlertaEliminarAlarma, setMostrarAlertaEliminarAlarma] =
-    useState(false);
+    useState<boolean>(false);
 
   const { Alerta } = useAlerts();
 
@@ -134,10 +144,9 @@ export const Activar_desactivar = () => {
   const cambiarEstadoAlarmaPeticion = async (alarmaData: AlarmaType) => {
     //setLoading(true);
     if (alarma?.estado !== "ENCENDIDO") {
-     
       try {
         setLoading(true);
-        
+
         const respuesta = await sesionPeticion({
           url: `${Constantes.baseUrl}/alarmas/${alarma?.id}/${
             alarma?.estado !== "ENCENDIDO" ? "encender" : "apagar"
@@ -161,7 +170,7 @@ export const Activar_desactivar = () => {
 
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/alarmas/${alarma?.id}/eliminar`,
-        tipo: 'patch'
+        tipo: "patch",
       });
 
       Alerta({
@@ -240,7 +249,10 @@ export const Activar_desactivar = () => {
   );
 
   const label = { inputProps: { "aria-label": "Switch demo" } };
-
+  const verficarBotonPanico = (alarma: AlarmaType) => {
+    if (alarma?.id === "1" || alarma?.id === "2") return true;
+    return false;
+  };
   const columnas: Array<ColumnaType> = [
     { campo: "id_alarma", nombre: "ID Alarma" },
     { campo: "nombre", nombre: "Nombre" },
@@ -274,9 +286,9 @@ export const Activar_desactivar = () => {
           key={`${alarmaData.id}-${indexAlarma}- alerta_sonido`}
         >
           <b>Alerta de sonido:</b>{" "}
-          {alarmaData.envio_noti === "2"
+          {alarmaData.sonido === "2"
             ? "Preguntar primero"
-            : alarmaData.envio_noti === "3"
+            : alarmaData.sonido === "3"
             ? "Automáticamente"
             : "No"}
         </Typography>
@@ -295,20 +307,26 @@ export const Activar_desactivar = () => {
           variant="body2"
           key={`${alarmaData.id}-${indexAlarma}- idSimulador`}
         >
-          <b>Simulador de presencia:</b> {`${alarmaData.simulador.nombre}`}
+          <b>Simulador de presencia:</b>{" "}
+          {`${
+            alarmaData?.simulador?.nombre ? alarmaData?.simulador?.nombre : ""
+          }`}
         </Typography>
       </>,
       <Typography
         key={`${alarmaData.id}-${indexAlarma}-idContactos`}
         variant={"body2"}
       >
-        {alarmaData.alarmaContactos.map((alarmaContacto, index) => (
+        {alarmaData.alarmaContactos?.map((alarmaContacto, index) => (
           <span key={index + alarmaContacto.id + "contactos"}>
             {"* " +
               alarmaContacto.contacto.nombre +
               " " +
               alarmaContacto.contacto.apellido}
-            {index < alarmaData.alarmaContactos.length - 1 && <br />}
+            {index <
+              (alarmaData.alarmaContactos
+                ? alarmaData.alarmaContactos.length - 1
+                : 0) && <br />}
           </span>
         ))}
       </Typography>,
@@ -331,18 +349,20 @@ export const Activar_desactivar = () => {
       >
         {/* {permisos.update && rolUsuario?.nombre === ROL_USUARIO && ( */}
         <Grid>
-          <Switch
-            {...label}
-            key={`${alarmaData.id}-${indexAlarma}-accionActivar`}
-            checked={alarmaData.estado === "ENCENDIDO"}
-            onClick={async () => {
-              await editarEstadoAlarmaModal(alarmaData);
-            }}
-            disabled={
-              verificarEncendido().length > 0 &&
-              !(verificarEncendido()[0].id === alarmaData.id)
-            }
-          />
+          {!verficarBotonPanico(alarmaData) && (
+            <Switch
+              {...label}
+              key={`${alarmaData.id}-${indexAlarma}-accionActivar`}
+              checked={alarmaData.estado === "ENCENDIDO"}
+              onClick={async () => {
+                await editarEstadoAlarmaModal(alarmaData);
+              }}
+              disabled={
+                verificarEncendido().length > 0 &&
+                !(verificarEncendido()[0].id === alarmaData.id)
+              }
+            />
+          )}
         </Grid>
         <Grid>
           <Button
@@ -357,20 +377,22 @@ export const Activar_desactivar = () => {
             <EditIcon />
           </Button>
         </Grid>
-        <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`accionEliminarAlarma`}
-            size={"small"}
-            color="error"
-            onClick={async () => {
-              await eliminarEstadoAlarmaModal(alarmaData);
-            }}
-          >
-            <Delete />
-          </Button>
-        </Grid>
+        {!verficarBotonPanico(alarmaData) && (
+          <Grid>
+            <Button
+              variant={"text"}
+              sx={{ ml: 1, mr: 1, textTransform: "none" }}
+              key={`accionEliminarAlarma`}
+              size={"small"}
+              color="error"
+              onClick={async () => {
+                await eliminarEstadoAlarmaModal(alarmaData);
+              }}
+            >
+              <Delete />
+            </Button>
+          </Grid>
+        )}
       </Grid>,
     ]
   );
@@ -388,6 +410,15 @@ export const Activar_desactivar = () => {
       await cambiarEstadoAlarmaPeticion(alarma);
     }
     setAlarma(null);
+  };
+  const activarBotonModal = async (id: string) => {
+    setIdAlarma(id);
+    setActivarBotonPanico(true);
+  };
+  const cerrarBotonModal = () => {
+    setIdAlarma(null);
+    setAlarma(null);
+    setActivarBotonPanico(false);
   };
   /// Método que cierra alerta de cambio de estado
 
@@ -411,6 +442,13 @@ export const Activar_desactivar = () => {
     //await delay(500) // para no mostrar undefined mientras el modal se cierra
     setAlarma(null);
   };
+
+  const activarBoton = (id: string) => {
+    const alarma = alarmasData.filter((alarma) => alarma.id === id);
+    setAlarma(alarma[0]);
+    activarBotonModal(id);
+  };
+
   useEffect(() => {
     peticionAlarmas();
     peticionContactos();
@@ -429,6 +467,28 @@ export const Activar_desactivar = () => {
         texto={`¿Está seguro de ${
           alarma?.estado == "ENCENDIDO" ? "Apagar" : "Encender"
         } a ${alarma?.nombre} ?`}
+      >
+        <Button onClick={cancelarAlertaEstadoAlarma}>Cancelar</Button>
+        <Button onClick={aceptarAlertaEstadoAlarma}>Aceptar</Button>
+      </AlertDialog>
+      <Dialog
+        open={mostrarActivarBotonPanico}
+        onClose={cerrarBotonModal}
+        maxWidth={"md"}
+      >
+        <ModalBoton
+          accionCancelar={cerrarBotonModal}
+          accionCorrecta={cerrarBotonModal}
+          idAlarma={idAlarma}
+          alarma={alarma}
+        />
+      </Dialog>
+      <AlertDialog
+        isOpen={mostrarAlertaEstadoAlarma}
+        titulo={"Alerta"}
+        texto={`¿Está seguro de activar alerta de pánico ${
+          idAlarma == "1" ? "Sonoro" : "Silencioso"
+        }?`}
       >
         <Button onClick={cancelarAlertaEstadoAlarma}>Cancelar</Button>
         <Button onClick={aceptarAlertaEstadoAlarma}>Aceptar</Button>
@@ -477,6 +537,74 @@ export const Activar_desactivar = () => {
               </Box>
             </Card>
           )}
+        </Grid>
+        <Grid item xs={11} sm={11} md={5} lg={5} xl={5}>
+          <Button
+            variant="contained"
+            sx={{
+              textTransform: "none",
+              backgroundColor: "#6D21D9", // Color verde (success)
+              "&:hover": {
+                backgroundColor: "#451786", // Cambio de color en hover
+              },
+              width: "31%", // Ajusta el ancho para que todos los botones tengan el mismo tamaño
+              margin: "1%",
+            }}
+            key="accionAgregarArticulo"
+            size="small"
+            onClick={() => {
+              activarBoton("1");
+            }}
+          >
+            <VolumeUpIcon sx={{ fontSize: 30, marginRight: 1 }} />
+            <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
+              Pánico sonoro
+            </Typography>
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              textTransform: "none",
+              backgroundColor: "#289DE1", // Color verde (success)
+              "&:hover": {
+                backgroundColor: "#1A628C", // Cambio de color en hover
+              },
+              width: "31%", // Ajusta el ancho para que todos los botones tengan el mismo tamaño
+              margin: "1%",
+            }}
+            key="accionAgregarArticulo"
+            size="small"
+            onClick={() => {
+              activarBoton("2");
+            }}
+          >
+            <VolumeMuteIcon sx={{ fontSize: 30, marginRight: 1 }} />
+            <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
+              Pánico insonoro
+            </Typography>
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              textTransform: "none",
+              backgroundColor: "#748198", // Color verde (success)
+              "&:hover": {
+                backgroundColor: "#44587A", // Cambio de color en hover
+              },
+              width: "31%", // Ajusta el ancho para que todos los botones tengan el mismo tamaño
+              margin: "1%",
+            }}
+            key="accionAgregarArticulo"
+            size="small"
+            onClick={() => {
+              activarBoton("SIRENA");
+            }}
+          >
+            <VolumeOffIcon sx={{ fontSize: 30, marginRight: 1 }} />
+            <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
+              Apagar sirenas
+            </Typography>
+          </Button>
         </Grid>
         <Dialog
           open={openModal}

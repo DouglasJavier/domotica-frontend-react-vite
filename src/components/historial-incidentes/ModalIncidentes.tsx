@@ -19,6 +19,7 @@ import { useAlerts } from "../../../common/hooks";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import dayjs from "dayjs";
 import { Constantes } from "../../../config";
+import { useSession } from "../../../common/hooks/useSession";
 
 interface IntervaloFechaType {
   fechaInicio: string;
@@ -128,6 +129,3 @@ export const ModalIncidente = ({
     </form>
   );
 };
-function useSession(): { sesionPeticion: any } {
-  throw new Error("Function not implemented.");
-}

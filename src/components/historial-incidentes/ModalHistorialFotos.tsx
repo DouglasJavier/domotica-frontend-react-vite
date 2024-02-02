@@ -111,51 +111,77 @@ export const ModalHistorialFotos = ({
               <Item key={i} foto={item} />
             ))}
           </Carousel>
-
-          <FormInputSwitch
-            id={"activarSonido"}
-            control={control}
-            name="activarSonido"
-            label={`Activar Alerta de sonido:`}
-            disabled={alarma?.sonido === "2" ? false : true}
-          />
-          <Typography variant="subtitle2">
-            {alarma?.sonido === "1"
-              ? "(No)"
-              : alarma?.sonido === "2"
-              ? "(Preguntar primero)"
-              : "(Automaticamente)"}
-          </Typography>
-          <br />
-          <FormInputSwitch
-            id={"notificacionContactos"}
-            control={control}
-            name="notificacionContactos"
-            label={`Enviar notificación a contactos :`}
-            disabled={alarma?.envio_noti === "2" ? false : true}
-          />
-          <Typography variant="subtitle2">
-            {alarma?.envio_noti === "1"
-              ? "(No)"
-              : alarma?.envio_noti === "2"
-              ? "(Preguntar primero)"
-              : "(Automaticamente)"}
-          </Typography>
+          {incidente?.estado === "DESATENDIDO" ||
+            (incidente?.alarma.id !== "1" && incidente?.alarma.id !== "2" && (
+              <>
+                <FormInputSwitch
+                  id={"activarSonido"}
+                  control={control}
+                  name="activarSonido"
+                  label={`Activar Alerta de sonido:`}
+                  disabled={alarma?.sonido === "2" ? false : true}
+                />
+                <Typography variant="subtitle2">
+                  {alarma?.sonido === "1"
+                    ? "(No)"
+                    : alarma?.sonido === "2"
+                    ? "(Preguntar primero)"
+                    : "(Automaticamente)"}
+                </Typography>
+                <br />
+                <FormInputSwitch
+                  id={"notificacionContactos"}
+                  control={control}
+                  name="notificacionContactos"
+                  label={`Enviar notificación a contactos :`}
+                  disabled={alarma?.envio_noti === "2" ? false : true}
+                />
+                <Typography variant="subtitle2">
+                  {alarma?.envio_noti === "1"
+                    ? "(No)"
+                    : alarma?.envio_noti === "2"
+                    ? "(Preguntar primero)"
+                    : "(Automaticamente)"}
+                </Typography>
+                {watch("notificacionContactos") && (
+                  <>
+                    <Typography variant="subtitle2">
+                      Las notificaciones se enviaran a:
+                    </Typography>
+                    {alarma?.alarmaContactos?.map((contacto) => (
+                      <Typography
+                        variant="subtitle2"
+                        key={"contacto" + contacto.id}
+                      >
+                        {"* " +
+                          contacto.contacto.nombre +
+                          " " +
+                          contacto.contacto.apellido}
+                      </Typography>
+                    ))}
+                  </>
+                )}
+              </>
+            ))}
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={async () => {
-              await descartarIncidente();
-              accionCorrecta();
-            }}
-          >
-            Descartar
-          </Button>
-          <Button variant="contained" type="submit" color="success">
-            Atender
-          </Button>
+          {incidente?.estado === "DESATENDIDO" && (
+            <>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={async () => {
+                  await descartarIncidente();
+                  accionCorrecta();
+                }}
+              >
+                Descartar
+              </Button>
+              <Button variant="contained" type="submit" color="success">
+                Atender
+              </Button>
+            </>
+          )}
           <Button variant="outlined" onClick={accionCancelar}>
             Salir
           </Button>

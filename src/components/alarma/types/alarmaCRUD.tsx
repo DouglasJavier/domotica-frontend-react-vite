@@ -20,7 +20,7 @@ export interface AlarmaType {
   idUbicaciones: string[];
   alarmaContactos: AlarmaContactoType[];
   ubicacionAlarmas: UbicacionAlarmasType[];
-  simulador: SimuladorType;
+  simulador: SimuladorType | null;
   estado: String;
   sonido: string;
   alumbradoAutomatico: boolean;

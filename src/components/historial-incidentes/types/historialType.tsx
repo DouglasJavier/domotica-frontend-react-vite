@@ -6,7 +6,7 @@ export interface HistorialType {
   idSensor: string;
   fotos: FotoType[];
   alarma: AlarmaType1;
-  sensor: SensorType;
+  sensor: SensorType | null;
 }
 interface AlarmaType1 {
   id: string;

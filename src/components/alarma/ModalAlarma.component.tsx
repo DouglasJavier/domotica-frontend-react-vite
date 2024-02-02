@@ -74,23 +74,49 @@ export const ModalAlarma = ({
   };
 
   const guardarActualizarAlarma = async (data: AlarmaCRUDType) => {
-    try {
-      const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/alarmas${
-          alarma?.id ? `/${alarma.id}` : ""
-        }`,
-        tipo: alarma?.id ? "patch" : "post",
-        body: data,
-      });
-      Alerta({
-        mensaje: InterpreteMensajes(respuesta),
-        variant: "success",
-      });
-      accionCorrecta();
-    } catch (e) {
-      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
-    } finally {
+    if (!verficarBotonPanico) {
+      try {
+        const respuesta = await sesionPeticion({
+          url: `${Constantes.baseUrl}/alarmas${
+            alarma?.id ? `/${alarma.id}` : ""
+          }`,
+          tipo: alarma?.id ? "patch" : "post",
+          body: data,
+        });
+        Alerta({
+          mensaje: InterpreteMensajes(respuesta),
+          variant: "success",
+        });
+        accionCorrecta();
+      } catch (e) {
+        Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+      } finally {
+      }
+    } else {
+        try {
+          const respuesta = await sesionPeticion({
+            url: `${Constantes.baseUrl}/alarmas${
+              alarma?.id ? `/${alarma.id}` : ""
+            }/editarBoton`,
+            tipo: "patch",
+            body: {
+              idContactos: watch('idContactos')
+            },
+          });
+          Alerta({
+            mensaje: InterpreteMensajes(respuesta),
+            variant: "success",
+          });
+          accionCorrecta();
+        } catch (e) {
+          Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+        } finally {
+        }
     }
+  };
+  const verficarBotonPanico = () => {
+    if ((alarma?.id === "1" || alarma?.id === "2") && alarma) return true;
+    return false;
   };
   return (
     <form onSubmit={handleSubmit(guardarActualizarAlarma)}>
@@ -103,61 +129,65 @@ export const ModalAlarma = ({
           control={control}
           name="nombre"
           label="Nombre de la alarma"
-          // disabled={loadingModal}
+          disabled={verficarBotonPanico()}
           rules={{ required: "Este campo es requerido" }}
         />
         <br />
-        <Grid container direction={"row"}>
-          <Grid item xs={12} sm={12} md={6}>
-            <br />
-            <FormInputSwitch
-              id={"seguridadBienes"}
-              control={control}
-              name="seguridadBienes"
-              label="Activar Seguridad para Bienes :"
-            />
-            <FormInputSwitch
-              id={"sensoresHumo"}
-              control={control}
-              name="sensoresHumo"
-              label="Activar sensores de humo :"
-            />
-            <FormInputSwitch
-              id={"alumbradoAutomatico"}
-              control={control}
-              name="alumbradoAutomatico"
-              label="Activar alumbrado automático :"
-            />
+        {!verficarBotonPanico() && (
+          <Grid container direction={"row"}>
+            <Grid item xs={12} sm={12} md={6}>
+              <br />
+              <FormInputSwitch
+                id={"seguridadBienes"}
+                control={control}
+                name="seguridadBienes"
+                label="Activar Seguridad para Bienes :"
+              />
+              <FormInputSwitch
+                id={"sensoresHumo"}
+                control={control}
+                name="sensoresHumo"
+                label="Activar sensores de humo :"
+              />
+              <FormInputSwitch
+                id={"alumbradoAutomatico"}
+                control={control}
+                name="alumbradoAutomatico"
+                label="Activar alumbrado automático :"
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6}>
+              <FormInputRadio
+                id={"sonido"}
+                name="sonido"
+                control={control}
+                label="Activar alaerta de sonido :"
+                options={[
+                  { label: "No", value: "1" },
+                  { label: "Preguntar primero", value: "2" },
+                  { label: "Automaticamente", value: "3" },
+                ]}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={12} md={6}>
-            <FormInputRadio
-              id={"sonido"}
-              name="sonido"
-              control={control}
-              label="Activar alaerta de sonido :"
-              options={[
-                { label: "No", value: "1" },
-                { label: "Preguntar primero", value: "2" },
-                { label: "Automaticamente", value: "3" },
-              ]}
-            />
-          </Grid>
-        </Grid>
+        )}
         <br />
         <Grid container alignItems={"center"} direction={"row"}>
-          <Grid item xs={12} sm={12} md={4}>
-            <FormInputRadio
-              id={"envio_noti"}
-              name="envio_noti"
-              control={control}
-              label="Envio de notificaciones a contactos :"
-              options={[
-                { label: "No", value: "1" },
-                { label: "Preguntar primero", value: "2" },
-                { label: "Automaticamente", value: "3" },
-              ]}
-            />
-          </Grid>
+          {!verficarBotonPanico() && (
+            <Grid item xs={12} sm={12} md={4}>
+              <FormInputRadio
+                id={"envio_noti"}
+                name="envio_noti"
+                control={control}
+                label="Envio de notificaciones a contactos :"
+                options={[
+                  { label: "No", value: "1" },
+                  { label: "Preguntar primero", value: "2" },
+                  { label: "Automaticamente", value: "3" },
+                ]}
+              />
+            </Grid>
+          )}
           <Grid item xs={12} sm={12} md={7}>
             {watch("envio_noti") !== "1" && (
               <FormInputDropdownMultiple
@@ -175,36 +205,38 @@ export const ModalAlarma = ({
             )}
           </Grid>
         </Grid>
-        <Grid container direction={"row"}>
-          <Grid item xs={12} sm={12} md={7}>
-            <FormInputDropdown
-              id={"idSimulador"}
-              name="idSimulador"
-              control={control}
-              label="Activar simulación de presencia:"
-              options={simuladores.map((simulacion) => ({
-                key: simulacion.id,
-                value: simulacion.id,
-                label: simulacion.nombre,
-              }))}
-              rules={{ required: "Este campo es requerido" }}
-            />
+        {!verficarBotonPanico() && (
+          <Grid container direction={"row"}>
+            <Grid item xs={12} sm={12} md={7}>
+              <FormInputDropdown
+                id={"idSimulador"}
+                name="idSimulador"
+                control={control}
+                label="Activar simulación de presencia:"
+                options={simuladores.map((simulacion) => ({
+                  key: simulacion.id,
+                  value: simulacion.id,
+                  label: simulacion.nombre,
+                }))}
+                rules={{ required: "Este campo es requerido" }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <FormInputDropdownMultiple
+                id={"idUbicaciones"}
+                name="idUbicaciones"
+                control={control}
+                label="La alarma estará activa en las Ubicaciones:"
+                options={ubicaciones.map((ubicacion) => ({
+                  key: ubicacion.id,
+                  value: ubicacion.id,
+                  label: ubicacion.nombre,
+                }))}
+                rules={{ required: "Este campo es requerido" }}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={12} md={12}>
-            <FormInputDropdownMultiple
-              id={"idUbicaciones"}
-              name="idUbicaciones"
-              control={control}
-              label="La alarma estará activa en las Ubicaciones:"
-              options={ubicaciones.map((ubicacion) => ({
-                key: ubicacion.id,
-                value: ubicacion.id,
-                label: ubicacion.nombre,
-              }))}
-              rules={{ required: "Este campo es requerido" }}
-            />
-          </Grid>
-        </Grid>
+        )}
       </DialogContent>
       <DialogActions
         sx={{

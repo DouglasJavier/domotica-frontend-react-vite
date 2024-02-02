@@ -16,7 +16,7 @@ import { useSession } from "../../common/hooks/useSession";
 import { useAuth } from "../../common/context/auth";
 import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 export const Incidentes_historial = () => {
   const { sesionPeticion } = useSession();
@@ -179,13 +179,17 @@ export const Incidentes_historial = () => {
         key={`${historialData.id}-${indexHistorialAD}- ubicacion`}
         variant={"body2"}
       >
-        {`${historialData.sensor.ubicacion.nombre}`}
+        {historialData.sensor?.ubicacion.nombre || ""}
       </Typography>,
       <Typography
         key={`${historialData.id}-${indexHistorialAD}- detalles`}
         variant={"body2"}
       >
-        {`El Sensor ${historialData.sensor.descripcion} detectó un incidente`}
+        {historialData.idAlarma === "1" || historialData.idAlarma === "2"
+          ? `Se activó el ${historialData.alarma.nombre}`
+          : `El Sensor ${
+              historialData.sensor?.descripcion || ""
+            } detectó un incidente`}
       </Typography>,
 
       <Chip
@@ -206,28 +210,29 @@ export const Incidentes_historial = () => {
               color="secondary"
               onClick={() => abrirFotoModal(historialData)}
             >
-              <VisibilityIcon/>
+              <VisibilityIcon />
             </Button>
           </Grid>
           {/* )} */}
         </Grid>
         <Grid item key={`${historialData.id}-${indexHistorialAD}-accion`}>
-          {usuario?.rol === "ADMINISTRADOR" && historialData.estado !== 'DESATENDIDO' && (
-            <Grid>
-              <Button
-                variant={"text"}
-                sx={{ ml: 1, mr: 1, textTransform: "none" }}
-                key={`accionAgregarArticulo`}
-                size={"small"}
-                color="error"
-                onClick={async () => {
-                  await eliminarHistorialModal(historialData);
-                }}
-              >
-                <Delete />
-              </Button>
-            </Grid>
-          )}
+          {usuario?.rol === "ADMINISTRADOR" &&
+            historialData.estado !== "DESATENDIDO" && (
+              <Grid>
+                <Button
+                  variant={"text"}
+                  sx={{ ml: 1, mr: 1, textTransform: "none" }}
+                  key={`accionAgregarArticulo`}
+                  size={"small"}
+                  color="error"
+                  onClick={async () => {
+                    await eliminarHistorialModal(historialData);
+                  }}
+                >
+                  <Delete />
+                </Button>
+              </Grid>
+            )}
         </Grid>
       </Grid>,
     ]
