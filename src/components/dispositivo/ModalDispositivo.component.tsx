@@ -51,7 +51,7 @@ export const ModalDispositivo = ({
   const { Alerta } = useAlerts();
   const { sesionPeticion } = useSession();
 
-  const { handleSubmit, control, getValues } = useForm<DispositivoCRUDType>({
+  const { handleSubmit, control, watch } = useForm<DispositivoCRUDType>({
     defaultValues: {
       id: dispositivo?.id,
       nombre: dispositivo?.nombre,
@@ -59,6 +59,7 @@ export const ModalDispositivo = ({
       idUbicacion: dispositivo?.ubicacion.id,
       direccionLan: dispositivo?.direccionLan,
       direccionWan: dispositivo?.direccionWan,
+      contrasenia: "",
       sensoresActuadores: dispositivo?.sensoresActuadores.map((sensores) => ({
         ...sensores,
         idUbicacion: sensores.ubicacion.id,
@@ -101,6 +102,7 @@ export const ModalDispositivo = ({
   const xs = useMediaQuery(theme.breakpoints.only("xs"));
 
   const guardarActualizarDispositivo = async (data: DispositivoCRUDType) => {
+    data.contrasenia = btoa(watch('contrasenia'))
     try {
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/dispositivos${
@@ -182,6 +184,24 @@ export const ModalDispositivo = ({
                 label: ubicacion.nombre,
               }))}
               rules={{ required: "Este campo es requerido" }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={6}>
+            <FormInputText
+              id={"contrasena"}
+              control={control}
+              name="contrasenia"
+              label="Contraseña"
+              size={"medium"}
+              labelVariant={"subtitle1"}
+              type={"password"}
+              rules={{
+                required: "Este campo es requerido",
+                minLength: {
+                  value: 3,
+                  message: "Mínimo 3 caracteres",
+                },
+              }}
             />
           </Grid>
         </Grid>

@@ -26,6 +26,7 @@ export interface DispositivoCRUDType {
   direccionLan: string;
   direccionWan: string;
   idUbicacion: string;
+  contrasenia: string;
   sensoresActuadores: SensoresActuadoresCRUDType[];
 }
 interface SensoresActuadoresCRUDType {
