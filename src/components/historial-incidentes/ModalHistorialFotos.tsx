@@ -19,7 +19,7 @@ import { useSession } from "../../../common/hooks/useSession";
 import { useEffect, useState } from "react";
 import { AlarmaType } from "../alarma/types/alarmaCRUD";
 import { useAlerts } from "../../../common/hooks";
-import { InterpreteMensajes } from "../../../common/utils";
+import { InterpreteMensajes, leerCookie } from "../../../common/utils";
 import { useForm } from "react-hook-form";
 import { FormInputSwitch } from "../../../common/components/ui/form/FormInputSwitch";
 interface ModalAlarmaProps {
@@ -111,8 +111,9 @@ export const ModalHistorialFotos = ({
               <Item key={i} foto={item} />
             ))}
           </Carousel>
-          {incidente?.estado === "DESATENDIDO" ||
-            (incidente?.alarma.id !== "1" && incidente?.alarma.id !== "2" && (
+          {incidente?.estado === "DESATENDIDO" &&
+            incidente?.alarma.id !== "1" &&
+            incidente?.alarma.id !== "2" && (
               <>
                 <FormInputSwitch
                   id={"activarSonido"}
@@ -162,7 +163,7 @@ export const ModalHistorialFotos = ({
                   </>
                 )}
               </>
-            ))}
+            )}
         </DialogContent>
         <DialogActions>
           {incidente?.estado === "DESATENDIDO" && (
@@ -203,7 +204,9 @@ function Item({ foto }: ItemProps) {
         <CardMedia
           component="img"
           height="500"
-          image={`${Constantes.baseUrl}/historialIncidentes/fotos/${foto.foto}`}
+          image={`${Constantes.baseUrl}/historialIncidentes/fotos/${
+            foto.foto
+          }?token=${leerCookie("token")}`}
         />
       </Card>
     </Paper>

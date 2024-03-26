@@ -5,6 +5,7 @@ export interface UsuarioType {
   usuario: string;
   contrasenia: string;
   rol: string;
+  idTelegram: string;
 }
 
 export interface LoginType {

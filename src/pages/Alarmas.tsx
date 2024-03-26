@@ -143,25 +143,24 @@ export const Activar_desactivar = () => {
   };
   const cambiarEstadoAlarmaPeticion = async (alarmaData: AlarmaType) => {
     //setLoading(true);
-    if (alarma?.estado !== "ENCENDIDO") {
-      try {
-        setLoading(true);
+    console.log("!!!!!", alarma);
+    try {
+      setLoading(true);
 
-        const respuesta = await sesionPeticion({
-          url: `${Constantes.baseUrl}/alarmas/${alarma?.id}/${
-            alarma?.estado !== "ENCENDIDO" ? "encender" : "apagar"
-          }`,
-          tipo: "patch",
-        });
-        Alerta({
-          mensaje: `${InterpreteMensajes(respuesta)}`,
-          variant: "success",
-        });
-      } catch (e) {
-        Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
-      } finally {
-        setLoading(false);
-      }
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/alarmas/${alarma?.id}/${
+          alarma?.estado !== "ENCENDIDO" ? "encender" : "apagar"
+        }`,
+        tipo: "patch",
+      });
+      Alerta({
+        mensaje: `${InterpreteMensajes(respuesta)}`,
+        variant: "success",
+      });
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
+    } finally {
+      setLoading(false);
     }
   };
   const eliminarAlarmaPeticion = async (alarmaData: AlarmaType) => {
@@ -188,7 +187,7 @@ export const Activar_desactivar = () => {
     <Button
       variant={"contained"}
       sx={{ ml: 1, mr: 1, textTransform: "none" }}
-      key={`accionAgregarArticulo`}
+      key={`accionAgregarArticulo2`}
       size={"small"}
       color="success"
       onClick={() => {
@@ -550,7 +549,7 @@ export const Activar_desactivar = () => {
               width: "31%", // Ajusta el ancho para que todos los botones tengan el mismo tamaño
               margin: "1%",
             }}
-            key="accionAgregarArticulo"
+            key="botonPanicoSonoro"
             size="small"
             onClick={() => {
               activarBoton("1");
@@ -594,7 +593,7 @@ export const Activar_desactivar = () => {
               width: "31%", // Ajusta el ancho para que todos los botones tengan el mismo tamaño
               margin: "1%",
             }}
-            key="accionAgregarArticulo"
+            key="apagarSirenas"
             size="small"
             onClick={() => {
               activarBoton("SIRENA");

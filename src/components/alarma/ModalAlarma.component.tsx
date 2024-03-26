@@ -74,7 +74,7 @@ export const ModalAlarma = ({
   };
 
   const guardarActualizarAlarma = async (data: AlarmaCRUDType) => {
-    if (!verficarBotonPanico) {
+    if (!verficarBotonPanico()) {
       try {
         const respuesta = await sesionPeticion({
           url: `${Constantes.baseUrl}/alarmas${
@@ -115,6 +115,7 @@ export const ModalAlarma = ({
     }
   };
   const verficarBotonPanico = () => {
+    console.log('####', alarma);
     if ((alarma?.id === "1" || alarma?.id === "2") && alarma) return true;
     return false;
   };

@@ -7,6 +7,8 @@ import {
   Grid,
   Modal,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import { CamaraType } from "./types/camaraType";
@@ -14,36 +16,38 @@ interface CardCamaraProps {
   camara: CamaraType;
   resposivo: boolean;
 }
-import { Constantes } from '../../../config'
+import { Constantes } from "../../../config";
+import { leerCookie } from "../../../common/utils";
 
 export const CardCamara = ({ camara, resposivo }: CardCamaraProps) => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [imagenDeRespaldoCargada, setImagenDeRespaldoCargada] = useState(false);
+  const theme = useTheme();
+
+  const xs = useMediaQuery(theme.breakpoints.only("xs"));
+  const sm = useMediaQuery(theme.breakpoints.only("sm"));
+
   const abrirModal = () => {
     setOpenModal(true);
   };
   const cerrarModal = () => {
     setOpenModal(false);
   };
-  const handleOnError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.log("##################################################")
-    console.log("Entró a handle error")
-    console.log("##################################################")
-    if (!imagenDeRespaldoCargada) {
-      const target = e.target as HTMLImageElement;
-      target.src = camara.direccionWan && camara.direccionWan;
-      setImagenDeRespaldoCargada(true);
-    }
-  };
+
   return (
     <>
-      <Card sx={{ marginTop: "5px" }}>
+      <Card sx={{ marginTop: "5px", width: xs || sm ? "100%" : "24vw" }}>
         <CardActionArea onClick={() => abrirModal()}>
           {/* <CardHeader /> */}
-          <CardMedia
-            component="img"
-            image={camara.direccionLan && ("http://" + camara.direccionLan + "/mjpeg")}
-          />
+          {!openModal && (
+            <CardMedia
+              component="img"
+              image={`${Constantes.baseUrl}/dispositivos/${
+                camara.id
+              }/stream?token=${leerCookie("token")}`}
+            />
+          )}
+
           <CardContent>
             <Typography variant="h6">
               {camara.nombre + " " + camara.ubicacion.nombre}
@@ -52,8 +56,13 @@ export const CardCamara = ({ camara, resposivo }: CardCamaraProps) => {
         </CardActionArea>
       </Card>
       <Modal open={openModal}>
-        <Grid container justifyContent={"center"} paddingTop={"2%"}>
-          <Card style={{ backgroundColor: "rgba(255, 255, 255, 0.8)" }}>
+        <Grid container justifyContent={"center"}>
+          <Card
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              width: xs || sm ? "100%" : "80%",
+            }}
+          >
             <Grid container justifyContent={"space-between"}>
               <Grid item>
                 <Typography variant="h6">
@@ -75,8 +84,9 @@ export const CardCamara = ({ camara, resposivo }: CardCamaraProps) => {
 
             <CardMedia
               component="img"
-              height={resposivo ? "190px" : "590px"}
-              image={"http://" + camara.direccionLan + "/mjpeg"}
+              image={`${Constantes.baseUrl}/dispositivos/${
+                camara.id
+              }/stream?token=${leerCookie("token")}`}
             />
           </Card>
         </Grid>

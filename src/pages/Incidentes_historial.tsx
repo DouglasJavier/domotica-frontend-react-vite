@@ -264,7 +264,7 @@ export const Incidentes_historial = () => {
 
   useEffect(() => {
     peticionHistorialIncidentes();
-  }, [historialIncidente]);
+  }, [historialIncidente, limite, pagina]);
 
   return (
     <Grid container justifyContent={"center"}>

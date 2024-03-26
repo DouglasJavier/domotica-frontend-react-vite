@@ -40,6 +40,7 @@ export const ModalUsuario = ({
         apellidos: usuario?.apellidos,
         usuario: usuario?.usuario,
         rol: usuario?.rol,
+        idTelegram: usuario?.idTelegram,
       },
     });
   const { Alerta } = useAlerts();
@@ -104,7 +105,7 @@ export const ModalUsuario = ({
         <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
           <Grid item xs={12} sm={6} md={6}>
             <FormInputText
-              id={"direccionLan"}
+              id={"usuario"}
               control={control}
               name="usuario"
               label="Usuario"
@@ -132,6 +133,18 @@ export const ModalUsuario = ({
                 },
               ]}
               // disabled={loadingModal}
+            />
+          </Grid>
+        </Grid>
+        <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
+          <Grid item xs={12} sm={6} md={6}>
+            <FormInputText
+              id={"idTelegram"}
+              control={control}
+              name="idTelegram"
+              label="ID Telegram"
+              // disabled={loadingModal}
+              rules={{ required: "Este campo es requerido" }}
             />
           </Grid>
         </Grid>

@@ -42,6 +42,7 @@ export const ModalUsuarioPerfil = ({
         apellidos: usuario?.apellidos,
         usuario: usuario?.usuario,
         rol: usuario?.rol,
+        idTelegram: usuario?.idTelegram,
         contrasenia1: "",
         contrasenia2: "",
       },
@@ -117,10 +118,20 @@ export const ModalUsuarioPerfil = ({
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
             <FormInputText
-              id={"direccionLan"}
+              id={"usuario"}
               control={control}
               name="usuario"
               label="Usuario"
+              // disabled={loadingModal}
+              rules={{ required: "Este campo es requerido" }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={6}>
+            <FormInputText
+              id={"idTelegram"}
+              control={control}
+              name="idTelegram"
+              label="ID Telegram"
               // disabled={loadingModal}
               rules={{ required: "Este campo es requerido" }}
             />

@@ -4,6 +4,7 @@ export interface UsuarioType {
   apellidos: string;
   usuario: string;
   contrasenia: string;
+  idTelegram: string;
   rol: string;
   estado?: string;
 }
@@ -13,6 +14,7 @@ export interface CambioUsuarioType {
   apellidos: string;
   usuario: string;
   contrasenia: string;
+  idTelegram: string;
   rol: string;
   contrasenia1: string;
   contrasenia2: string;

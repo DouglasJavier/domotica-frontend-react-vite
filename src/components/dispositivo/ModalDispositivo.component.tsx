@@ -28,7 +28,12 @@ import { UbicacionType } from "../alarma/types/alarmaCRUD";
 import axios from "axios";
 import { InterpreteMensajes } from "../../../common/utils/interpreteMensajes";
 import { useAlerts } from "../../../common/hooks";
-import { Constantes } from "../../../config";
+import {
+  Constantes,
+  tipoActuadorConst,
+  tipoDispositivoConst,
+  tipoSensorConst,
+} from "../../../config";
 import { useSession } from "../../../common/hooks/useSession";
 
 interface TipoType {
@@ -55,7 +60,7 @@ export const ModalDispositivo = ({
     defaultValues: {
       id: dispositivo?.id,
       nombre: dispositivo?.nombre,
-      tipo: dispositivo?.tipo,
+      tipo: dispositivo?.tipo || tipoDispositivoConst[0],
       idUbicacion: dispositivo?.ubicacion.id,
       direccionLan: dispositivo?.direccionLan,
       direccionWan: dispositivo?.direccionWan,
@@ -102,7 +107,7 @@ export const ModalDispositivo = ({
   const xs = useMediaQuery(theme.breakpoints.only("xs"));
 
   const guardarActualizarDispositivo = async (data: DispositivoCRUDType) => {
-    data.contrasenia = btoa(watch('contrasenia'))
+    data.contrasenia = btoa(watch("contrasenia"));
     try {
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/dispositivos${
@@ -147,7 +152,7 @@ export const ModalDispositivo = ({
               control={control}
               name="tipo"
               label="Tipo de board"
-              // disabled={loadingModal}
+             disabled
               rules={{ required: "Este campo es requerido" }}
             />
           </Grid>
@@ -219,7 +224,7 @@ export const ModalDispositivo = ({
               </TableHead>
               {fieldsSensores.map((sensor, index) => (
                 <TableRow>
-                  <TableCell>
+                  <TableCell sx={{ width: "100px" }}>
                     <FormInputText
                       id={`sensoresActuadores.${index}.pin`}
                       control={control}
@@ -230,7 +235,7 @@ export const ModalDispositivo = ({
                   </TableCell>
                   <TableCell>
                     <FormInputDropdown
-                      id={"idSimulador"}
+                      id={"tipo"}
                       name={`sensoresActuadores.${index}.tipo`}
                       control={control}
                       label=""
@@ -243,11 +248,26 @@ export const ModalDispositivo = ({
                     />
                   </TableCell>
                   <TableCell>
-                    <FormInputText
-                      id={`sensoresActuadores.${index}.descripcion`}
-                      control={control}
+                    <FormInputDropdown
+                      id={"tipo"}
                       name={`sensoresActuadores.${index}.descripcion`}
+                      control={control}
                       label=""
+                      options={
+                        watch(`sensoresActuadores.${index}.tipo`) === "ACTUADOR"
+                          ? tipoActuadorConst.map((tipo) => ({
+                              key: tipo,
+                              value: tipo,
+                              label: tipo,
+                            }))
+                          : tipoSensorConst.map((tipo) => ({
+                              key: tipo,
+                              value: tipo,
+                              label: tipo,
+                            }))
+                      }
+                      disabled={!watch(`sensoresActuadores.${index}.tipo`)}
+                      rules={{ required: "Este campo es requerido" }}
                     />
                   </TableCell>
                   <TableCell>
