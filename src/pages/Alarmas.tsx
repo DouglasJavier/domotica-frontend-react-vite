@@ -6,10 +6,6 @@ import {
   Button,
   Card,
   Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Grid,
   Switch,
   Typography,
@@ -18,18 +14,11 @@ import { ReactNode, useEffect, useState } from "react";
 import { ModalAlarma } from "../components/alarma/ModalAlarma.component";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import {
-  AlertDialog,
-  CustomDataTable,
-  CustomDialog,
-  Icono,
-  IconoTooltip,
-} from "../../common/components/ui";
+import { AlertDialog, CustomDataTable } from "../../common/components/ui";
 //import { imprimir } from "../components/common/utils/imprimir";
 import { Paginacion } from "../../common/components/ui/Paginacion";
 import axios from "axios";
 import {
-  AlarmaCRUDType,
   AlarmaType,
   ContactoType,
   SimuladorType,
@@ -364,17 +353,18 @@ export const Activar_desactivar = () => {
           )}
         </Grid>
         <Grid>
-          <Button
-            variant={"text"}
-            sx={{ ml: 1, mr: 1, textTransform: "none" }}
-            key={`${alarmaData.id}-${indexAlarma}-accionEditar`}
-            size={"small"}
-            onClick={() => {
-              editarAlarmaModal(alarmaData);
-            }}
-          >
-            <EditIcon />
-          </Button>
+          
+            <Button
+              variant={"text"}
+              sx={{ ml: 1, mr: 1, textTransform: "none" }}
+              key={`${alarmaData.id}-${indexAlarma}-accionEditar`}
+              size={"small"}
+              onClick={() => {
+                editarAlarmaModal(alarmaData);
+              }}
+            >
+              <EditIcon />
+            </Button>
         </Grid>
         {!verficarBotonPanico(alarmaData) && (
           <Grid>

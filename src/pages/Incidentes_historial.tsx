@@ -5,8 +5,6 @@ import { Delete } from "@mui/icons-material";
 import { ColumnaType } from "../../common/types";
 import { AlertDialog, CustomDataTable } from "../../common/components/ui";
 import { Paginacion } from "../../common/components/ui/Paginacion";
-import BurstModeIcon from "@mui/icons-material/BurstMode";
-import axios from "axios";
 import { HistorialType } from "../components/historial-incidentes/types/historialType";
 import { useAlerts } from "../../common/hooks";
 import { InterpreteMensajes } from "../../common/utils/interpreteMensajes";
@@ -14,9 +12,9 @@ import { ModalIncidente } from "../components/historial-incidentes/ModalIncident
 import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
 import { useAuth } from "../../common/context/auth";
-import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import dayjs from "dayjs";
 
 export const Incidentes_historial = () => {
   const { sesionPeticion } = useSession();
@@ -156,6 +154,11 @@ export const Incidentes_historial = () => {
         return "error";
     }
   };
+
+  function formatearFecha(fechaISO: string): string {
+    const fecha = dayjs(fechaISO);
+    return fecha.format("DD/MM/YYYY HH:mm");
+  }
   const columnas: Array<ColumnaType> = [
     { campo: "id_historial", nombre: "ID Historial" },
     { campo: "fecha", nombre: "Fecha" },
@@ -174,7 +177,9 @@ export const Incidentes_historial = () => {
       <Typography
         key={`${historialData.fecha}-${indexHistorialAD}-fecha`}
         variant={"body2"}
-      >{`${historialData.fecha}`}</Typography>,
+      >
+        {formatearFecha(`${historialData.fecha}`)}
+      </Typography>,
       <Typography
         key={`${historialData.id}-${indexHistorialAD}- ubicacion`}
         variant={"body2"}

@@ -16,6 +16,7 @@ import { Constantes } from "../../config";
 import { useSession } from "../../common/hooks/useSession";
 import { useAuth } from "../../common/context/auth";
 import { VerificarIncidentes } from "../components/VerificarIncidentes.component";
+import dayjs from "dayjs";
 
 //import { ModalalarmaFotos } from "../components/historial-activacion/RowalarmaActivacion.component";
 
@@ -151,7 +152,7 @@ export const Activ_desac_historial = () => {
       <Typography
         key={`${historialData.fecha}-${index}-fecha`}
         variant={"body2"}
-      >{`${historialData.fecha}`}</Typography>,
+      > {formatearFecha(`${historialData.fecha}`)}</Typography>,
       <Typography
         key={`${historialData.id}-${index}- usuario`}
         variant={"body2"}
@@ -214,6 +215,10 @@ export const Activ_desac_historial = () => {
   const refrescar = async () => {
     peticionHistorialActivarDesactivar();
   };
+  function formatearFecha(fechaISO: string): string {
+    const fecha = dayjs(fechaISO);
+    return fecha.format("DD/MM/YYYY HH:mm");
+  }
   useEffect(() => {
     peticionHistorialActivarDesactivar();
   }, []);

@@ -101,12 +101,12 @@ export const ModalContacto = ({
               id={"nombre"}
               control={control}
               name="numeroTel1"
-              label="Numero telefónico principal"
+              label="ID de telegram"
               // disabled={loadingModal}
               rules={{ required: "Este campo es requerido" }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={6}>
+          {/* <Grid item xs={12} sm={12} md={6}>
             <FormInputText
               id={"apellido"}
               control={control}
@@ -115,7 +115,7 @@ export const ModalContacto = ({
               // disabled={loadingModal}
               //rules={{ required: "Este campo es requerido" }}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </DialogContent>
       <DialogActions

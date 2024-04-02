@@ -125,7 +125,7 @@ export const Contactos_conf = () => {
     { campo: "id_contacto", nombre: "ID Contacto" },
     { campo: "nombre", nombre: "Nombres" },
     { campo: "apellidos", nombre: "Apellidos" },
-    { campo: "numeros", nombre: "Numeros de celular" },
+    { campo: "numeros", nombre: "ID de telegram" },
     { campo: "accion", nombre: "Alarmas" },
     { campo: "acciones", nombre: "Acciones" },
   ];
@@ -162,7 +162,7 @@ export const Contactos_conf = () => {
       </>,
       <Grid>
         <Stack direction="column" spacing={1}>
-          {contactoData.alarmaContactos.map((alarma) => (
+          {contactoData.alarmaContactos.map((alarma) => ( alarma.alarma !== null &&
             <Chip label={alarma.alarma.nombre} key={alarma.id} />
           ))}
         </Stack>
