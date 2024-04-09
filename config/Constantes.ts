@@ -1,3 +1,4 @@
+console.log(import.meta);
 export const Constantes = {
   baseUrl: import.meta.env.VITE_BASE_URL,
   siteName: import.meta.env.VITE_SITE_NAME,

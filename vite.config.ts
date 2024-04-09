@@ -9,6 +9,13 @@ export default defineConfig({
     port: 8080,
   },
   envDir: './', // Esto le dice a Vite que busque archivos .env en la raíz del proyecto
+  define: {
+    'import.meta.env': {
+      VITE_BASE_URL: process.env.VITE_BASE_URL,
+      VITE_SITE_NAME: process.env.VITE_SITE_NAME,
+      VITE_APP_ENV: process.env.VITE_APP_ENV
+    }
+  }
 });
 // https://vitejs.dev/config/
 /* export default ({ mode }) => {
