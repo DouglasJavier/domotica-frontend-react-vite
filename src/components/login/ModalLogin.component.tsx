@@ -1,4 +1,4 @@
-import { Box, Button, Card, Divider } from "@mui/material";
+import { Box, Button, Card, CardMedia, Divider } from "@mui/material";
 import { FormInputText } from "../../../common/components/ui/form";
 import Typography from "@mui/material/Typography";
 import { Constantes } from "../../../config";
@@ -33,12 +33,16 @@ const LoginNormalContainer = () => {
           alignItems={"center"}
           sx={{ borderRadius: 12 }}
         >
+          <CardMedia
+              component="img"
+              image={`iconoSeguridad.png`}
+            />
           <Typography
             align={"center"}
             color={"primary"}
             sx={{ flexGrow: 1, fontWeight: "medium" }}
           >
-            Iniciar Sesión
+            Sistema domótico de seguridad
           </Typography>
           <Box sx={{ mt: 1, mb: 1 }}></Box>
           <FormInputText

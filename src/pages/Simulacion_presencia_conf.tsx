@@ -304,7 +304,7 @@ export const Simulacion_presencia_conf = () => {
         <Grid item xs={12} sm={12} md={10} lg={11} xl={11} marginTop={"3%"}>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12} marginTop={"1%"}>
             <CustomDataTable
-              titulo={"Historial de activación y desactivación de simuladors"}
+              titulo={"Simuladores de presencia"}
               error={!!errorArticulosData}
               cargando={loading}
               acciones={acciones}
