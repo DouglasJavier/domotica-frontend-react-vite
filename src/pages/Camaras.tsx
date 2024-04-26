@@ -39,10 +39,10 @@ export const Camaras = () => {
       <Grid
         container
         marginTop={"3%"}
-        justifyContent={sm || xs ? "center" : "space-around"}
+        justifyContent={sm || xs ? "center" : "center"}
       >
         {camarasData.map((camara) => (
-          <Grid item xs={11} sm={11} md={5}>
+          <Grid item width={xs ? "100vw" : "25vw"}>
             <CardCamara camara={camara} resposivo={sm || xs} />
           </Grid>
         ))}

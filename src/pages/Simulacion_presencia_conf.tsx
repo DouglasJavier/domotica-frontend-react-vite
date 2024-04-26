@@ -107,7 +107,7 @@ export const Simulacion_presencia_conf = () => {
         },
       });
       setSimuladoresData(respuesta[0]);
-      setTotal(respuesta.datos?.total);
+      setTotal(respuesta[1]);
     } catch (e) {
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
     } finally {

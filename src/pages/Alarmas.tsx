@@ -81,7 +81,7 @@ export const Activar_desactivar = () => {
         },
       });
       setAlarmasData(respuesta[0]);
-      setTotal(respuesta.datos?.total);
+      setTotal(respuesta[1]);
     } catch (e) {
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: "error" });
     } finally {
@@ -353,7 +353,7 @@ export const Activar_desactivar = () => {
           )}
         </Grid>
         <Grid>
-          
+          {alarmaData?.estado === "ACTIVO" && (
             <Button
               variant={"text"}
               sx={{ ml: 1, mr: 1, textTransform: "none" }}
@@ -365,6 +365,7 @@ export const Activar_desactivar = () => {
             >
               <EditIcon />
             </Button>
+          )}
         </Grid>
         {!verficarBotonPanico(alarmaData) && (
           <Grid>
@@ -472,7 +473,7 @@ export const Activar_desactivar = () => {
           alarma={alarma}
         />
       </Dialog>
-      <AlertDialog
+      {/* <AlertDialog
         isOpen={mostrarAlertaEstadoAlarma}
         titulo={"Alerta"}
         texto={`¿Está seguro de activar alerta de pánico ${
@@ -481,7 +482,7 @@ export const Activar_desactivar = () => {
       >
         <Button onClick={cancelarAlertaEstadoAlarma}>Cancelar</Button>
         <Button onClick={aceptarAlertaEstadoAlarma}>Aceptar</Button>
-      </AlertDialog>
+      </AlertDialog> */}
       <AlertDialog
         isOpen={mostrarAlertaEliminarAlarma}
         titulo={"Alerta"}

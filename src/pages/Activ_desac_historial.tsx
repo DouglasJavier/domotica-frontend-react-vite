@@ -98,9 +98,8 @@ export const Activ_desac_historial = () => {
   ) => {
     try {
       setLoading(true);
-
       const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}}/historialActivarDesactivar/${historialActivarDesactivar?.id}/limpiar`,
+        url: `${Constantes.baseUrl}/historialActivarDesactivar/${historialActivarDesactivar?.id}/limpiar`,
         tipo: "patch",
       });
       Alerta({
@@ -114,25 +113,6 @@ export const Activ_desac_historial = () => {
     }
   };
   /**************************************************************************/
-  const agregaralarmaModal = () => {
-    setalarma(undefined);
-    setOpenModal(true);
-  };
-  const editaralarmaModal = (alarma: alarmaType | undefined) => {
-    setalarma(alarma);
-    setOpenModal(true);
-  };
-
-  const cerraralarmaModal = async () => {
-    setOpenModal(false);
-    setalarma(undefined);
-    //  await delay(500)
-    //  setSistemaEdicion(undefined)
-  };
-
-  const obteneralarmasPeticion = async () => {
-    console.log("obteniendo sistema");
-  };
 
   const columnas: Array<ColumnaType> = [
     { campo: "id_historial", nombre: "ID Historial" },
@@ -152,7 +132,10 @@ export const Activ_desac_historial = () => {
       <Typography
         key={`${historialData.fecha}-${index}-fecha`}
         variant={"body2"}
-      > {formatearFecha(`${historialData.fecha}`)}</Typography>,
+      >
+        {" "}
+        {formatearFecha(`${historialData.fecha}`)}
+      </Typography>,
       <Typography
         key={`${historialData.id}-${index}- usuario`}
         variant={"body2"}
@@ -202,10 +185,11 @@ export const Activ_desac_historial = () => {
     setMostrarAlertaEliminarHistorial(true); // para mostrar alerta de articulos
   };
   const aceptarAlertaEliminarAlarma = async () => {
-    setMostrarAlertaEliminarHistorial(false);
     if (historialActivarDesactivar) {
+      setHistorialActivarDesactivar(historialActivarDesactivar);
       await eliminarHistorialIncidentePeticion(historialActivarDesactivar);
     }
+    setMostrarAlertaEliminarHistorial(false);
     setHistorialActivarDesactivar(null);
   };
   const cancelarAlertaEliminarAlarma = async () => {
