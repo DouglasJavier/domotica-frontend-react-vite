@@ -42,7 +42,6 @@ export const CustomDataTable = ({
   const theme = useTheme()
   // const sm = useMediaQuery(theme.breakpoints.only('sm'))
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
-  console.log(columnas)
   return (
     <Box sx={{ pb: 2 }}>
       {/*título y acciones*/}

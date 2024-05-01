@@ -96,9 +96,6 @@ export const Navbar = ({ cambiarEstado }: NavbarProps) => {
   const abrirUsuarioModal = async () => {
     setOpenModal(true);
   };
-  console.log('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
-  console.log(usuario);
-  console.log('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSsSSS');
   return (
     <>
       <FormGroup>

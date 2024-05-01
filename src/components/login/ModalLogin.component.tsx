@@ -18,9 +18,6 @@ const LoginNormalContainer = () => {
   });
 
   const iniciarSesion = async ({ usuario, contrasena }: any) => {
-    console.log("entro");
-    /* console.log(usuario);
-    console.log(contrasena); */
     await ingresar({ usuario, contrasena });
   };
 

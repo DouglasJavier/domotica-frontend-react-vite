@@ -42,9 +42,6 @@ export const ModalUbicacion = ({
   const { Alerta } = useAlerts();
   const { sesionPeticion } = useSession();
 
-  console.log("*******************************************");
-  console.log(getValues());
-  console.log("*******************************************");
   const defaultOption = { key: "", value: "", label: "" };
 
   const guardarActualizarUbicacion = async (data: UbicacionType) => {

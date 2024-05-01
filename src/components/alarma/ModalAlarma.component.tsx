@@ -65,10 +65,6 @@ export const ModalAlarma = ({
         alumbradoAutomatico: alarma?.alumbradoAutomatico,
       },
     });
-  console.log("*******************************************");
-  console.log(getValues());
-  console.log(alarma);
-  console.log("*******************************************");
   const handleChange = (event: SelectChangeEvent) => {
     setSim(parseInt(event.target.value) as number);
   };
@@ -115,7 +111,6 @@ export const ModalAlarma = ({
     }
   };
   const verficarBotonPanico = () => {
-    console.log('####', alarma);
     if ((alarma?.id === "1" || alarma?.id === "2") && alarma) return true;
     return false;
   };

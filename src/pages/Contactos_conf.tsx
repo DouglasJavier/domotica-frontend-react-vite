@@ -117,10 +117,6 @@ export const Contactos_conf = () => {
   };
   /**********************************************************************************/
 
-  const obtenerContactosPeticion = async () => {
-    console.log("obteniendo sistema");
-  };
-
   const columnas: Array<ColumnaType> = [
     { campo: "id_contacto", nombre: "ID Contacto" },
     { campo: "nombre", nombre: "Nombres" },

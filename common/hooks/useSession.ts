@@ -22,19 +22,15 @@ export const useSession = () => {
     withCredentials,
   }: peticionFormatoMetodo) => {
     try {
-      console.log("token:   ");
       if (!verificarToken(leerCookie("token") ?? "")) {
-        console.log("entro a cerrar");
         await cerrarSesion();
         //await actualizarSesion();
       }
-      console.log("no entro a cerrar");
       const cabeceras = {
         accept: "application/json",
         Authorization: `Bearer ${leerCookie("token") ?? ""}`,
         ...headers,
       };
-      console.log("cabecera", cabeceras);
       const response = await Servicios.peticionHTTP({
         url,
         tipo,

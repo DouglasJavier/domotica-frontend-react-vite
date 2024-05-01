@@ -50,9 +50,6 @@ export const ModalUsuarioPerfil = ({
   const { Alerta } = useAlerts();
   const { sesionPeticion } = useSession();
 
-  console.log("*******************************************");
-  console.log(getValues());
-  console.log("*******************************************");
   const defaultOption = { key: "", value: "", label: "" };
 
   const guardarActualizarUsuario = async (data: UsuarioType) => {

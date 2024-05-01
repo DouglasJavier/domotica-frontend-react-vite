@@ -111,7 +111,6 @@ class ServiciosClass {
     responseType,
     withCredentials,
   }: peticionFormato): Promise<any> {
-    console.log('entro a post');
     return await this.peticion({
       url,
       tipo: 'post',

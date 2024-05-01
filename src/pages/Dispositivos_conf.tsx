@@ -82,9 +82,6 @@ export const Dispositivos_conf = () => {
     //  setSistemaEdicion(undefined)
   };
 
-  const obtenerDispositivosPeticion = async () => {
-    console.log("obteniendo sistema");
-  };
   /**********************************************************************************/
   const peticionDispositivos = async () => {
     try {

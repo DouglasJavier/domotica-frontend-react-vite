@@ -34,9 +34,6 @@ interface Props {
 export const Sidebar: FC<PropsWithChildren<Props>> = ({ children }) => {
   const sideMenuOpen = useContext(userContext).sideMenuOpen;
   const { usuario } = useAuth();
-  console.log("#######################");
-  console.log(usuario);
-  console.log("#######################");
   //const [sideMenuOpen, setSideMenuOpen] = useState<boolean>(true);
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.only("sm"));

@@ -40,7 +40,6 @@ export const FormInputTime = <T extends FieldValues>({
   const { handleSubmit } = useForm();
 
   const onSubmit = (data: T) => {
-    console.log("Datos guardados:", data);
     // Aquí puedes realizar la lógica para guardar los datos
   };
 

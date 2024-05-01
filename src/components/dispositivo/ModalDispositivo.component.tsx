@@ -19,7 +19,7 @@ import {
   FormInputText,
   optionType,
 } from "../../../common/components/ui/form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DispositivoCRUDType,
   DispositivoType,
@@ -55,7 +55,7 @@ export const ModalDispositivo = ({
 }: ModalDispositivoProps) => {
   const { Alerta } = useAlerts();
   const { sesionPeticion } = useSession();
-
+  /* const [mostrarTabla, setMostrarTabla] = useState<boolean>(true) */
   const { handleSubmit, control, watch } = useForm<DispositivoCRUDType>({
     defaultValues: {
       id: dispositivo?.id,
@@ -72,15 +72,15 @@ export const ModalDispositivo = ({
     },
   });
 
-  const defaultOption = { key: "", value: "", label: "" };
+  /* const defaultOption = { key: "", value: "", label: "" }; */
 
-  const [defaultActuadorData, setDefaultActuadorData] =
+  /* const [defaultActuadorData, setDefaultActuadorData] =
     useState<optionType>(defaultOption);
   const guardarActualizarDispositivoPeticion = async (
     dispositivo: DispositivoType
   ) => {
     console.log(dispositivo);
-  };
+  }; */
   const {
     fields: fieldsSensores,
     append: appendSensores,
@@ -96,6 +96,10 @@ export const ModalDispositivo = ({
       descripcion: "",
       idUbicacion: "",
     });
+  };
+
+  const eliminarSensor = async (index: number) => {
+    removeSensores(index);
   };
 
   const opcionesTipo: TipoType[] = [
@@ -126,7 +130,11 @@ export const ModalDispositivo = ({
     } finally {
     }
   };
-
+/*   useEffect(() => {
+    setMostrarTabla(false)
+    setMostrarTabla(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watch('sensoresActuadores')]) */
   return (
     <form onSubmit={handleSubmit(guardarActualizarDispositivo)}>
       <DialogTitle>
@@ -152,7 +160,7 @@ export const ModalDispositivo = ({
               control={control}
               name="tipo"
               label="Tipo de board"
-             disabled
+              disabled
               rules={{ required: "Este campo es requerido" }}
             />
           </Grid>
@@ -224,6 +232,9 @@ export const ModalDispositivo = ({
               </TableHead>
               {fieldsSensores.map((sensor, index) => (
                 <TableRow>
+                  {/* <TableCell sx={{ width: "100px" }}>
+                    {sensor.pin}
+                  </TableCell> */}
                   <TableCell sx={{ width: "100px" }}>
                     <FormInputText
                       id={`sensoresActuadores.${index}.pin`}
@@ -288,7 +299,7 @@ export const ModalDispositivo = ({
                     <Button
                       //variant="outlined"
                       //color="warning"
-                      onClick={() => removeSensores(index)}
+                      onClick={() => eliminarSensor(index)}
                     >
                       <HighlightOffIcon />
                     </Button>

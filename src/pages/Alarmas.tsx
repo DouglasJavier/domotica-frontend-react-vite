@@ -41,9 +41,6 @@ interface ColumnaType {
 }
 
 export const Activar_desactivar = () => {
-  /* console.log("*************************************************");
-  console.log(Constantes.baseUrl);
-  console.log("*************************************************"); */
   const { sesionPeticion } = useSession();
 
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -132,7 +129,6 @@ export const Activar_desactivar = () => {
   };
   const cambiarEstadoAlarmaPeticion = async (alarmaData: AlarmaType) => {
     //setLoading(true);
-    console.log("!!!!!", alarma);
     try {
       setLoading(true);
 

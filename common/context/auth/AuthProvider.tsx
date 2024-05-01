@@ -114,10 +114,6 @@ export const AuthProvider = ({ children }: AuthContextType) => {
 
   const login = async ({ usuario, contrasena }: LoginType) => {
     try {
-      console.log("entro login");
-      console.log(usuario);
-      console.log(contrasena);
-      console.log(Constantes.baseUrl);
       const pass = btoa(contrasena);
       const respuesta = await Servicios.post({
         url: `${Constantes.baseUrl}/auth`,
