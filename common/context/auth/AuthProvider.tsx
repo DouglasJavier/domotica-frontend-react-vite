@@ -131,7 +131,7 @@ export const AuthProvider = ({ children }: AuthContextType) => {
         .catch((err) => {
           Alerta({ mensaje: `${InterpreteMensajes(err)}`, variant: "error" });
         }); */
-
+        console.log('token al iniciar: ', respuesta.access_token);
       guardarCookie("token", respuesta.access_token);
       setUser(respuesta);
       navigate("/admin", { replace: true });

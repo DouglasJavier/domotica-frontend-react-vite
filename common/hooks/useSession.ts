@@ -22,6 +22,7 @@ export const useSession = () => {
     withCredentials,
   }: peticionFormatoMetodo) => {
     try {
+      console.log('Token :', leerCookie('token'));
       if (!verificarToken(leerCookie("token") ?? "")) {
         await cerrarSesion();
         //await actualizarSesion();
