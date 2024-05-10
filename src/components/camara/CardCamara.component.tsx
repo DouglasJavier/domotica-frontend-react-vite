@@ -36,18 +36,24 @@ export const CardCamara = ({ camara, resposivo }: CardCamaraProps) => {
 
   return (
     <>
-      <Card sx={{ marginTop: "5px", width: xs || sm ? "100%" : "24vw" }}>
+      <Card sx={{ marginTop: "5px", width: "400px" }}>
         <CardActionArea onClick={() => abrirModal()}>
           {/* <CardHeader /> */}
           {!openModal && (
-            <CardMedia
-              component="img"
-              image={`${Constantes.baseUrl}/dispositivos/${
+            <iframe
+              srcDoc={`
+                <img src="${Constantes.baseUrl}/dispositivos/${
                 camara.id
-              }/stream?token=${leerCookie("token")}`}
+              }/stream?token=${leerCookie(
+                "token"
+              )}" width= 380px; height= 330px/>
+            `}
+              title="Contenido dentro del iframe"
+              //style={iframeStyles}
+              width="100%"
+              height="350px"
             />
           )}
-
           <CardContent>
             <Typography variant="h6">
               {camara.nombre + " " + camara.ubicacion.nombre}
@@ -81,13 +87,25 @@ export const CardCamara = ({ camara, resposivo }: CardCamaraProps) => {
                 </Button>
               </Grid>
             </Grid>
-
-            <CardMedia
+            <iframe
+              srcDoc={`
+                <img src="${Constantes.baseUrl}/dispositivos/${
+                camara.id
+              }/stream?token=${leerCookie(
+                "token"
+              )}" width= 100%; height= 100%/>
+            `}
+              title="Contenido dentro del iframe"
+              //style={iframeStyles}
+              width="100%"
+              height="850"
+            />
+            {/* <CardMedia
               component="img"
               image={`${Constantes.baseUrl}/dispositivos/${
                 camara.id
               }/stream?token=${leerCookie("token")}`}
-            />
+            /> */}
           </Card>
         </Grid>
       </Modal>
