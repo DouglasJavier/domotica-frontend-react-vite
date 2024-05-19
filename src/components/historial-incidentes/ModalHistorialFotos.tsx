@@ -203,7 +203,7 @@ function Item({ foto }: ItemProps) {
       <Card>
         <CardMedia
           component="img"
-          height="500"
+          height="100%"
           image={`${Constantes.baseUrl}/historialIncidentes/fotos/${
             foto.foto
           }?token=${leerCookie("token")}`}

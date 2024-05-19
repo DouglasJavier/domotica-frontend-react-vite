@@ -98,7 +98,7 @@ export const ModalDispositivo = ({
     });
   };
 
-  const eliminarSensor = async (index: number) => {
+  const eliminarSensor = (index: number) => {
     removeSensores(index);
   };
 
